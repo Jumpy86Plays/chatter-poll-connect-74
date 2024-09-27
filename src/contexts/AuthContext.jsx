@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
 const AuthContext = createContext();
 
@@ -9,9 +10,17 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    if (currentUser) {
+      const newSocket = io('http://localhost:3000'); // Replace with your WebSocket server URL
+      setSocket(newSocket);
+      return () => newSocket.close();
+    }
+  }, [currentUser]);
 
   function login(email, password) {
-    // Mock login function
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (email === 'user@example.com' && password === 'password') {
@@ -27,11 +36,14 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    // Mock logout function
     return new Promise((resolve) => {
       setTimeout(() => {
         setCurrentUser(null);
         localStorage.removeItem('user');
+        if (socket) {
+          socket.close();
+          setSocket(null);
+        }
         resolve();
       }, 1000);
     });
@@ -46,7 +58,8 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     login,
-    logout
+    logout,
+    socket
   };
 
   return (
