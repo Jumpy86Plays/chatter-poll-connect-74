@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Captcha from './Captcha';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    if (!isCaptchaValid) {
+      setError('Please enter the correct captcha');
+      return;
+    }
+
     try {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError('Failed to log in');
+      setError('Failed to log in. Please check your credentials.');
     }
   };
 
@@ -48,7 +57,8 @@ const Login: React.FC = () => {
                 required
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">Login</button>
+            <Captcha onValidate={setIsCaptchaValid} />
+            <button type="submit" className="btn btn-primary w-100" disabled={!isCaptchaValid}>Login</button>
           </form>
         </div>
       </div>
