@@ -35,6 +35,18 @@ export function AuthProvider({ children }) {
     });
   }
 
+  function signIn(email, password) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        // In a real application, you would check if the user exists and create a new account if not
+        const user = { email };
+        setCurrentUser(user);
+        localStorage.setItem('user', JSON.stringify(user));
+        resolve(user);
+      }, 1000);
+    });
+  }
+
   function logout() {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -58,6 +70,7 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     login,
+    signIn,
     logout,
     socket
   };
