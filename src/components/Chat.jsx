@@ -39,18 +39,16 @@ const Chat = () => {
           </div>
         ))}
       </ScrollArea>
-      {currentUser.isAdmin && (
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <Input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-grow"
-          />
-          <Button type="submit">Send</Button>
-        </form>
-      )}
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <Input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-grow"
+        />
+        <Button type="submit">Send</Button>
+      </form>
     </div>
   );
 };

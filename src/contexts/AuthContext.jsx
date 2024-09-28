@@ -11,6 +11,8 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
+  const [loggedInUsers, setLoggedInUsers] = useState([]);
+  const [voters, setVoters] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
@@ -26,11 +28,13 @@ export function AuthProvider({ children }) {
         if (email === 'admin@gmail.com' && password === 'admin123') {
           const user = { email, isAdmin: true };
           setCurrentUser(user);
+          setLoggedInUsers(prev => [...prev, email]);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
         } else if (email === 'user@example.com' && password === 'password') {
           const user = { email, isAdmin: false };
           setCurrentUser(user);
+          setLoggedInUsers(prev => [...prev, email]);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
         } else {
@@ -45,6 +49,7 @@ export function AuthProvider({ children }) {
       setTimeout(() => {
         const user = { email, isAdmin: false };
         setCurrentUser(user);
+        setLoggedInUsers(prev => [...prev, email]);
         localStorage.setItem('user', JSON.stringify(user));
         resolve(user);
       }, 1000);
@@ -55,6 +60,7 @@ export function AuthProvider({ children }) {
     return new Promise((resolve) => {
       setTimeout(() => {
         setCurrentUser(null);
+        setLoggedInUsers(prev => prev.filter(user => user !== currentUser.email));
         localStorage.removeItem('user');
         if (socket) {
           socket.close();
@@ -65,9 +71,16 @@ export function AuthProvider({ children }) {
     });
   }
 
+  function addVoter(voter) {
+    setVoters(prev => [...prev, voter]);
+  }
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
-    setCurrentUser(user);
+    if (user) {
+      setCurrentUser(user);
+      setLoggedInUsers(prev => [...prev, user.email]);
+    }
     setLoading(false);
   }, []);
 
@@ -76,7 +89,10 @@ export function AuthProvider({ children }) {
     login,
     signIn,
     logout,
-    socket
+    socket,
+    loggedInUsers,
+    voters,
+    addVoter
   };
 
   return (

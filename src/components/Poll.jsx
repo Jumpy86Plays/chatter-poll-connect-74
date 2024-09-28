@@ -4,27 +4,24 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 
 const Poll = () => {
   const [poll, setPoll] = useState({ question: 'Favorite color?', options: ['Red', 'Blue', 'Green'] });
   const [votes, setVotes] = useState({ Red: 0, Blue: 0, Green: 0 });
   const [userVote, setUserVote] = useState('');
-  const [voters, setVoters] = useState([]);
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, addVoter } = useAuth();
+  const [newOption, setNewOption] = useState('');
 
   useEffect(() => {
     if (socket) {
       socket.on('poll update', (updatedVotes) => {
         setVotes(updatedVotes);
       });
-      socket.on('voters update', (updatedVoters) => {
-        setVoters(updatedVoters);
-      });
     }
     return () => {
       if (socket) {
         socket.off('poll update');
-        socket.off('voters update');
       }
     };
   }, [socket]);
@@ -33,8 +30,34 @@ const Poll = () => {
     e.preventDefault();
     if (userVote && socket) {
       socket.emit('poll vote', { option: userVote, user: currentUser.email });
+      addVoter(currentUser.email);
       setUserVote('');
     }
+  };
+
+  const handleAddOption = () => {
+    if (newOption && !poll.options.includes(newOption)) {
+      setPoll(prevPoll => ({
+        ...prevPoll,
+        options: [...prevPoll.options, newOption]
+      }));
+      setVotes(prevVotes => ({
+        ...prevVotes,
+        [newOption]: 0
+      }));
+      setNewOption('');
+    }
+  };
+
+  const handleRemoveOption = (optionToRemove) => {
+    setPoll(prevPoll => ({
+      ...prevPoll,
+      options: prevPoll.options.filter(option => option !== optionToRemove)
+    }));
+    setVotes(prevVotes => {
+      const { [optionToRemove]: removed, ...rest } = prevVotes;
+      return rest;
+    });
   };
 
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
@@ -65,13 +88,25 @@ const Poll = () => {
         ))}
       </div>
       {currentUser.isAdmin && (
-        <div>
-          <h3 className="text-lg font-semibold mt-4">Voters:</h3>
-          <ul>
-            {voters.map((voter, index) => (
-              <li key={index}>{voter}</li>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold mt-4">Admin Controls</h3>
+          <div className="flex space-x-2">
+            <Input
+              type="text"
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              placeholder="New option"
+            />
+            <Button onClick={handleAddOption}>Add Option</Button>
+          </div>
+          <div className="space-y-2">
+            {poll.options.map((option) => (
+              <div key={option} className="flex justify-between items-center">
+                <span>{option}</span>
+                <Button onClick={() => handleRemoveOption(option)} variant="destructive">Remove</Button>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

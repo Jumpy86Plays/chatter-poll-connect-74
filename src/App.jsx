@@ -2,30 +2,52 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import ChatPage from './pages/ChatPage';
 import PollPage from './pages/PollPage';
+import Dashboard from './pages/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import Navbar from './components/Navbar';
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
+        <Navbar />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
             path="/"
             element={
               <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <ChatPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/poll"
+            element={
+              <PrivateRoute>
+                <PollPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
                 <Dashboard />
               </PrivateRoute>
             }
-          >
-            <Route index element={<Home />} />
-            <Route path="chat" element={<ChatPage />} />
-            <Route path="poll" element={<PollPage />} />
-          </Route>
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
