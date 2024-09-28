@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Button, Form, ProgressBar } from 'react-bootstrap';
+import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 
 const Poll = () => {
   const [poll, setPoll] = useState({ question: 'Favorite color?', options: ['Red', 'Blue', 'Green'] });
@@ -14,6 +17,11 @@ const Poll = () => {
         setVotes(updatedVotes);
       });
     }
+    return () => {
+      if (socket) {
+        socket.off('poll update');
+      }
+    };
   }, [socket]);
 
   const handleVote = (e) => {
@@ -24,28 +32,30 @@ const Poll = () => {
     }
   };
 
+  const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+
   return (
-    <div className="mt-4">
-      <h2>Live Poll: {poll.question}</h2>
-      <Form onSubmit={handleVote}>
-        {poll.options.map((option) => (
-          <Form.Check
-            key={option}
-            type="radio"
-            label={option}
-            name="pollOption"
-            value={option}
-            onChange={(e) => setUserVote(e.target.value)}
-            checked={userVote === option}
-          />
-        ))}
-        <Button type="submit" className="mt-2">Vote</Button>
-      </Form>
-      <div className="mt-3">
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">{poll.question}</h2>
+      <form onSubmit={handleVote} className="space-y-4">
+        <RadioGroup value={userVote} onValueChange={setUserVote}>
+          {poll.options.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <RadioGroupItem value={option} id={option} />
+              <Label htmlFor={option}>{option}</Label>
+            </div>
+          ))}
+        </RadioGroup>
+        <Button type="submit" disabled={!userVote}>Vote</Button>
+      </form>
+      <div className="space-y-2">
         {Object.entries(votes).map(([option, count]) => (
           <div key={option}>
-            <p>{option}</p>
-            <ProgressBar now={(count / Object.values(votes).reduce((a, b) => a + b, 0)) * 100} label={`${count}`} />
+            <div className="flex justify-between mb-1">
+              <span>{option}</span>
+              <span>{count} votes</span>
+            </div>
+            <Progress value={(count / totalVotes) * 100} className="h-2" />
           </div>
         ))}
       </div>

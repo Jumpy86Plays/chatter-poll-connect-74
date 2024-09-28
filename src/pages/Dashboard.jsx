@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Button, Container, Row, Col } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import Chat from '../components/Chat';
 import Poll from '../components/Poll';
+import { Button } from '@/components/ui/button';
 
 const Dashboard = () => {
   const { currentUser, logout } = useAuth();
@@ -19,23 +19,40 @@ const Dashboard = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <Row>
-        <Col>
-          <h1 className="mb-4">Welcome to the Dashboard</h1>
-          <p className="mb-4">You are logged in as: {currentUser.email}</p>
-          <Button onClick={handleLogout} variant="danger">Log Out</Button>
-        </Col>
-      </Row>
-      <Row className="mt-4">
-        <Col md={6}>
-          <Chat />
-        </Col>
-        <Col md={6}>
-          <Poll />
-        </Col>
-      </Row>
-    </Container>
+    <div className="min-h-screen bg-gray-100">
+      <nav className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <span className="text-xl font-semibold">Dashboard</span>
+            </div>
+            <div className="flex items-center">
+              <span className="mr-4">Logged in as: {currentUser?.email}</span>
+              <Button onClick={handleLogout} variant="destructive">Log Out</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold mb-4">Chat</h2>
+                <Chat />
+              </div>
+            </div>
+            <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold mb-4">Poll</h2>
+                <Poll />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
