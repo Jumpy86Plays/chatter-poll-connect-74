@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const { currentUser, socket } = useAuth();
+  const scrollAreaRef = useRef(null);
 
   useEffect(() => {
     if (socket) {
@@ -22,24 +23,32 @@ const Chat = () => {
     };
   }, [socket]);
 
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim() && socket) {
-      socket.emit('chat message', { user: currentUser.email, text: newMessage, isAdmin: currentUser.isAdmin });
+      const messageObj = { user: currentUser.email, text: newMessage, isAdmin: currentUser.isAdmin };
+      socket.emit('chat message', messageObj);
+      setMessages((prevMessages) => [...prevMessages, messageObj]);
       setNewMessage('');
     }
   };
 
   return (
-    <div className="flex flex-col h-[400px]">
-      <ScrollArea className="flex-grow mb-4 p-4 border rounded-md">
+    <div className="flex flex-col h-[600px] border rounded-md">
+      <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
         {messages.map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.isAdmin ? 'font-bold' : ''}`}>
             <strong>{msg.user}:</strong> {msg.text}
           </div>
         ))}
       </ScrollArea>
-      <form onSubmit={handleSubmit} className="flex gap-2">
+      <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
         <Input
           type="text"
           value={newMessage}

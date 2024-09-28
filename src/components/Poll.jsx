@@ -31,6 +31,10 @@ const Poll = () => {
     if (userVote && socket) {
       socket.emit('poll vote', { option: userVote, user: currentUser.email });
       addVoter(currentUser.email);
+      setVotes(prevVotes => ({
+        ...prevVotes,
+        [userVote]: prevVotes[userVote] + 1
+      }));
       setUserVote('');
     }
   };
@@ -64,7 +68,7 @@ const Poll = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">{poll.question}</h2>
+      <h2 className="text-2xl font-semibold">{poll.question}</h2>
       <form onSubmit={handleVote} className="space-y-4">
         <RadioGroup value={userVote} onValueChange={setUserVote}>
           {poll.options.map((option) => (
