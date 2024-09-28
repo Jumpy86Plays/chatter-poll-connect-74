@@ -25,7 +25,7 @@ const Chat = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim() && socket) {
-      socket.emit('chat message', { user: currentUser.email, text: newMessage });
+      socket.emit('chat message', { user: currentUser.email, text: newMessage, isAdmin: currentUser.isAdmin });
       setNewMessage('');
     }
   };
@@ -34,21 +34,23 @@ const Chat = () => {
     <div className="flex flex-col h-[400px]">
       <ScrollArea className="flex-grow mb-4 p-4 border rounded-md">
         {messages.map((msg, index) => (
-          <div key={index} className="mb-2">
+          <div key={index} className={`mb-2 ${msg.isAdmin ? 'font-bold' : ''}`}>
             <strong>{msg.user}:</strong> {msg.text}
           </div>
         ))}
       </ScrollArea>
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-grow"
-        />
-        <Button type="submit">Send</Button>
-      </form>
+      {currentUser.isAdmin && (
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <Input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-grow"
+          />
+          <Button type="submit">Send</Button>
+        </form>
+      )}
     </div>
   );
 };

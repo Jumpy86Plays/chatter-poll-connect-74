@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Chat from '../components/Chat';
 import Poll from '../components/Poll';
 import { Button } from '@/components/ui/button';
@@ -24,10 +24,13 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <span className="text-xl font-semibold">Dashboard</span>
+              <span className="text-xl font-semibold mr-4">Dashboard</span>
+              <Link to="/dashboard" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Home</Link>
+              <Link to="/dashboard/chat" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Chat</Link>
+              <Link to="/dashboard/poll" className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Poll</Link>
             </div>
             <div className="flex items-center">
-              <span className="mr-4">Logged in as: {currentUser?.email}</span>
+              <span className="mr-4">Logged in as: {currentUser?.email} {currentUser?.isAdmin ? '(Admin)' : ''}</span>
               <Button onClick={handleLogout} variant="destructive">Log Out</Button>
             </div>
           </div>

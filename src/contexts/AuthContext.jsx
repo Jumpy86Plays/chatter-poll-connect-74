@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (currentUser) {
-      const newSocket = io('http://localhost:3000'); // Replace with your WebSocket server URL
+      const newSocket = io('http://localhost:3000');
       setSocket(newSocket);
       return () => newSocket.close();
     }
@@ -23,8 +23,13 @@ export function AuthProvider({ children }) {
   function login(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (email === 'user@example.com' && password === 'password') {
-          const user = { email };
+        if (email === 'admin@gmail.com' && password === 'admin123') {
+          const user = { email, isAdmin: true };
+          setCurrentUser(user);
+          localStorage.setItem('user', JSON.stringify(user));
+          resolve(user);
+        } else if (email === 'user@example.com' && password === 'password') {
+          const user = { email, isAdmin: false };
           setCurrentUser(user);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
@@ -38,8 +43,7 @@ export function AuthProvider({ children }) {
   function signIn(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // In a real application, you would check if the user exists and create a new account if not
-        const user = { email };
+        const user = { email, isAdmin: false };
         setCurrentUser(user);
         localStorage.setItem('user', JSON.stringify(user));
         resolve(user);

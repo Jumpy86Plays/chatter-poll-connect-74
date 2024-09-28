@@ -9,17 +9,22 @@ const Poll = () => {
   const [poll, setPoll] = useState({ question: 'Favorite color?', options: ['Red', 'Blue', 'Green'] });
   const [votes, setVotes] = useState({ Red: 0, Blue: 0, Green: 0 });
   const [userVote, setUserVote] = useState('');
-  const { socket } = useAuth();
+  const [voters, setVoters] = useState([]);
+  const { currentUser, socket } = useAuth();
 
   useEffect(() => {
     if (socket) {
       socket.on('poll update', (updatedVotes) => {
         setVotes(updatedVotes);
       });
+      socket.on('voters update', (updatedVoters) => {
+        setVoters(updatedVoters);
+      });
     }
     return () => {
       if (socket) {
         socket.off('poll update');
+        socket.off('voters update');
       }
     };
   }, [socket]);
@@ -27,7 +32,7 @@ const Poll = () => {
   const handleVote = (e) => {
     e.preventDefault();
     if (userVote && socket) {
-      socket.emit('poll vote', userVote);
+      socket.emit('poll vote', { option: userVote, user: currentUser.email });
       setUserVote('');
     }
   };
@@ -59,6 +64,16 @@ const Poll = () => {
           </div>
         ))}
       </div>
+      {currentUser.isAdmin && (
+        <div>
+          <h3 className="text-lg font-semibold mt-4">Voters:</h3>
+          <ul>
+            {voters.map((voter, index) => (
+              <li key={index}>{voter}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
