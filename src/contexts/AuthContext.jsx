@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
   const [socket, setSocket] = useState(null);
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [voters, setVoters] = useState([]);
+  const [polls, setPolls] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
@@ -75,6 +76,46 @@ export function AuthProvider({ children }) {
     setVoters(prev => [...prev, voter]);
   }
 
+  function addPoll(newPoll) {
+    setPolls(prev => [...prev, { ...newPoll, id: Date.now().toString(), totalVotes: 0 }]);
+  }
+
+  function vote(pollId, option) {
+    setPolls(prev => prev.map(poll => {
+      if (poll.id === pollId) {
+        const updatedVotes = { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 };
+        return { ...poll, votes: updatedVotes, totalVotes: poll.totalVotes + 1 };
+      }
+      return poll;
+    }));
+    addVoter(currentUser.email);
+  }
+
+  function addOption(pollId, option) {
+    setPolls(prev => prev.map(poll => {
+      if (poll.id === pollId) {
+        return { ...poll, options: [...poll.options, option] };
+      }
+      return poll;
+    }));
+  }
+
+  function removeOption(pollId, option) {
+    setPolls(prev => prev.map(poll => {
+      if (poll.id === pollId) {
+        const updatedOptions = poll.options.filter(o => o !== option);
+        const { [option]: removedVotes, ...updatedVotes } = poll.votes;
+        return { 
+          ...poll, 
+          options: updatedOptions, 
+          votes: updatedVotes,
+          totalVotes: poll.totalVotes - (removedVotes || 0)
+        };
+      }
+      return poll;
+    }));
+  }
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -92,7 +133,12 @@ export function AuthProvider({ children }) {
     socket,
     loggedInUsers,
     voters,
-    addVoter
+    addVoter,
+    polls,
+    addPoll,
+    vote,
+    addOption,
+    removeOption
   };
 
   return (

@@ -1,19 +1,21 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserIcon, UserCheckIcon } from 'lucide-react';
+import { UserIcon, UserCheckIcon, BarChartIcon } from 'lucide-react';
 
 const Dashboard = () => {
-  const { loggedInUsers, voters } = useAuth();
+  const { loggedInUsers, voters, polls } = useAuth();
 
-  if (!loggedInUsers || !voters) {
+  if (!loggedInUsers || !voters || !polls) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
+
+  const totalVotes = polls.reduce((sum, poll) => sum + poll.totalVotes, 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-8 text-center">Admin Dashboard</h2>
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-3 gap-8">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -48,6 +50,17 @@ const Dashboard = () => {
                 </li>
               ))}
             </ul>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <BarChartIcon className="mr-2" />
+              Total Votes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-bold text-center">{totalVotes}</p>
           </CardContent>
         </Card>
       </div>
