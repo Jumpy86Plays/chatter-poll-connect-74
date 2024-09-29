@@ -22,7 +22,7 @@ const ChatPage = () => {
           Chatting with: <strong>{selectedUser}</strong>
         </p>
       )}
-      <Chat />
+      <Chat selectedUser={selectedUser} />
     </div>
   );
 };

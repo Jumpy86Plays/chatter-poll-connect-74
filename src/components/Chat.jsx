@@ -6,7 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SendIcon } from 'lucide-react';
 
-const Chat = () => {
+const Chat = ({ selectedUser }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const { currentUser, socket } = useAuth();
@@ -37,21 +37,30 @@ const Chat = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim() && socket) {
-      const messageObj = { user: currentUser.email, text: newMessage, isAdmin: currentUser.isAdmin };
+      const messageObj = {
+        user: currentUser.email,
+        text: newMessage,
+        isAdmin: currentUser.isAdmin,
+        recipient: currentUser.isAdmin ? selectedUser : 'admin'
+      };
       socket.emit('chat message', messageObj);
       setMessages((prevMessages) => [...prevMessages, messageObj]);
       setNewMessage('');
     }
   };
 
+  const filteredMessages = currentUser.isAdmin
+    ? messages.filter(msg => msg.user === selectedUser || msg.recipient === selectedUser)
+    : messages;
+
   return (
     <Card className="h-[600px] flex flex-col">
       <CardHeader>
-        <CardTitle>Chat Room</CardTitle>
+        <CardTitle>Chat Room {selectedUser && `- Chatting with ${selectedUser}`}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col">
         <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-          {messages.map((msg, index) => (
+          {filteredMessages.map((msg, index) => (
             <div
               key={index}
               className={`mb-2 p-2 rounded-lg ${
