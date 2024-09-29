@@ -16,6 +16,9 @@ const Chat = () => {
     if (socket) {
       socket.on('chat message', (msg) => {
         setMessages((prevMessages) => [...prevMessages, msg]);
+        if (currentUser.isAdmin && msg.user !== currentUser.email) {
+          socket.emit('new notification', { sender: msg.user, message: msg.text });
+        }
       });
     }
     return () => {
@@ -23,7 +26,7 @@ const Chat = () => {
         socket.off('chat message');
       }
     };
-  }, [socket]);
+  }, [socket, currentUser]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
