@@ -51,7 +51,7 @@ const Chat = ({ selectedUser }) => {
 
   const filteredMessages = currentUser.isAdmin
     ? messages.filter(msg => msg.user === selectedUser || msg.recipient === selectedUser)
-    : messages;
+    : messages.filter(msg => msg.user === currentUser.email || msg.recipient === currentUser.email);
 
   return (
     <Card className="h-[600px] flex flex-col">
@@ -60,18 +60,22 @@ const Chat = ({ selectedUser }) => {
       </CardHeader>
       <CardContent className="flex-grow flex flex-col">
         <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-          {filteredMessages.map((msg, index) => (
-            <div
-              key={index}
-              className={`mb-2 p-2 rounded-lg ${
-                msg.user === currentUser.email
-                  ? 'bg-primary text-white self-end'
-                  : 'bg-gray-100 text-gray-800 self-start'
-              } ${msg.isAdmin ? 'font-bold' : ''}`}
-            >
-              <strong>{msg.user}:</strong> {msg.text}
-            </div>
-          ))}
+          {filteredMessages.length === 0 ? (
+            <p className="text-center text-gray-500">No messages yet. Start a conversation!</p>
+          ) : (
+            filteredMessages.map((msg, index) => (
+              <div
+                key={index}
+                className={`mb-2 p-2 rounded-lg ${
+                  msg.user === currentUser.email
+                    ? 'bg-primary text-white self-end'
+                    : 'bg-gray-100 text-gray-800 self-start'
+                } ${msg.isAdmin ? 'font-bold' : ''}`}
+              >
+                <strong>{msg.user}:</strong> {msg.text}
+              </div>
+            ))
+          )}
         </ScrollArea>
         <form onSubmit={handleSubmit} className="flex gap-2 mt-4">
           <Input
