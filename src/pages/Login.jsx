@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Captcha from '../components/Captcha';
+import { LogInIcon, UserPlusIcon } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -38,42 +39,48 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4">
-            <div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
               <Input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
+                placeholder="Enter your email"
                 required
               />
             </div>
-            <div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
               <Input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
+                placeholder="Enter your password"
                 required
               />
             </div>
             <Captcha onValidate={setIsCaptchaValid} />
             <Button type="submit" className="w-full" disabled={!isCaptchaValid}>
+              <LogInIcon className="h-4 w-4 mr-2" />
               Log In
             </Button>
-            <Button
-              type="button"
-              onClick={(e) => handleSubmit(e, true)}
-              className="w-full mt-2"
-              disabled={!isCaptchaValid}
-            >
-              Sign In
-            </Button>
           </form>
+          <Button
+            onClick={(e) => handleSubmit(e, true)}
+            className="w-full"
+            variant="outline"
+            disabled={!isCaptchaValid}
+          >
+            <UserPlusIcon className="h-4 w-4 mr-2" />
+            Sign Up
+          </Button>
           {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         </CardContent>
       </Card>
