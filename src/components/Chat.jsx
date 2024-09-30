@@ -6,10 +6,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SendIcon, MegaphoneIcon } from 'lucide-react';
 
-const Chat = ({ selectedUser }) => {
+const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
-  const { currentUser, socket, messages, sendMessage, sendAnnouncement } = useAuth();
+  const { currentUser, messages, sendMessage, sendAnnouncement } = useAuth();
   const scrollAreaRef = useRef(null);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const Chat = ({ selectedUser }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim()) {
-      sendMessage(newMessage, selectedUser);
+      sendMessage(newMessage, currentUser.isAdmin ? 'all' : 'admin');
       setNewMessage('');
     }
   };
@@ -35,13 +35,13 @@ const Chat = ({ selectedUser }) => {
   };
 
   const filteredMessages = currentUser.isAdmin
-    ? messages.filter(msg => msg.from === selectedUser || msg.to === selectedUser || msg.isAnnouncement)
-    : messages.filter(msg => msg.from === currentUser.email || msg.to === currentUser.email || msg.isAnnouncement);
+    ? messages
+    : messages.filter(msg => msg.from === currentUser.email || msg.to === currentUser.email || msg.isAnnouncement || msg.to === 'all');
 
   return (
     <Card className="h-[600px] flex flex-col">
       <CardHeader>
-        <CardTitle>Chat Room {selectedUser && `- Chatting with ${selectedUser}`}</CardTitle>
+        <CardTitle>Chat Room</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col">
         <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
