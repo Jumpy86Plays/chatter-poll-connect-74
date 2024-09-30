@@ -18,6 +18,7 @@ export function AuthProvider({ children }) {
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [voters, setVoters] = useState([]);
   const [polls, setPolls] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
@@ -26,6 +27,19 @@ export function AuthProvider({ children }) {
       return () => newSocket.close();
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('chat message', (msg) => {
+        setMessages((prevMessages) => [...prevMessages, msg]);
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off('chat message');
+      }
+    };
+  }, [socket]);
 
   function login(email, password) {
     return new Promise((resolve, reject) => {
@@ -120,6 +134,33 @@ export function AuthProvider({ children }) {
     }));
   }
 
+  function sendMessage(text, to) {
+    const newMessage = {
+      from: currentUser.email,
+      to,
+      text,
+      isAdmin: currentUser.isAdmin,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, newMessage]);
+    if (socket) {
+      socket.emit('chat message', newMessage);
+    }
+  }
+
+  function sendAnnouncement(text) {
+    const newAnnouncement = {
+      from: currentUser.email,
+      text,
+      isAnnouncement: true,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages(prev => [...prev, newAnnouncement]);
+    if (socket) {
+      socket.emit('chat message', newAnnouncement);
+    }
+  }
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -142,7 +183,10 @@ export function AuthProvider({ children }) {
     addPoll,
     vote,
     addOption,
-    removeOption
+    removeOption,
+    messages,
+    sendMessage,
+    sendAnnouncement,
   };
 
   return (

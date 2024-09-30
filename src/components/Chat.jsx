@@ -4,29 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SendIcon } from 'lucide-react';
+import { SendIcon, MegaphoneIcon } from 'lucide-react';
 
 const Chat = ({ selectedUser }) => {
-  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const { currentUser, socket } = useAuth();
+  const [announcement, setAnnouncement] = useState('');
+  const { currentUser, socket, messages, sendMessage, sendAnnouncement } = useAuth();
   const scrollAreaRef = useRef(null);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('chat message', (msg) => {
-        setMessages((prevMessages) => [...prevMessages, msg]);
-        if (currentUser.isAdmin && msg.user !== currentUser.email) {
-          socket.emit('new notification', { sender: msg.user, message: msg.text });
-        }
-      });
-    }
-    return () => {
-      if (socket) {
-        socket.off('chat message');
-      }
-    };
-  }, [socket, currentUser]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -36,22 +20,23 @@ const Chat = ({ selectedUser }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newMessage.trim() && socket) {
-      const messageObj = {
-        user: currentUser.email,
-        text: newMessage,
-        isAdmin: currentUser.isAdmin,
-        recipient: currentUser.isAdmin ? selectedUser : 'admin'
-      };
-      socket.emit('chat message', messageObj);
-      setMessages((prevMessages) => [...prevMessages, messageObj]);
+    if (newMessage.trim()) {
+      sendMessage(newMessage, selectedUser);
       setNewMessage('');
     }
   };
 
+  const handleAnnouncement = (e) => {
+    e.preventDefault();
+    if (announcement.trim()) {
+      sendAnnouncement(announcement);
+      setAnnouncement('');
+    }
+  };
+
   const filteredMessages = currentUser.isAdmin
-    ? messages.filter(msg => msg.user === selectedUser || msg.recipient === selectedUser)
-    : messages.filter(msg => msg.user === currentUser.email || msg.recipient === currentUser.email);
+    ? messages.filter(msg => msg.from === selectedUser || msg.to === selectedUser || msg.isAnnouncement)
+    : messages.filter(msg => msg.from === currentUser.email || msg.to === currentUser.email || msg.isAnnouncement);
 
   return (
     <Card className="h-[600px] flex flex-col">
@@ -67,12 +52,23 @@ const Chat = ({ selectedUser }) => {
               <div
                 key={index}
                 className={`mb-2 p-2 rounded-lg ${
-                  msg.user === currentUser.email
+                  msg.isAnnouncement
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : msg.from === currentUser.email
                     ? 'bg-primary text-white self-end'
                     : 'bg-gray-100 text-gray-800 self-start'
                 } ${msg.isAdmin ? 'font-bold' : ''}`}
               >
-                <strong>{msg.user}:</strong> {msg.text}
+                {msg.isAnnouncement ? (
+                  <>
+                    <MegaphoneIcon className="inline mr-2" />
+                    <strong>Announcement:</strong> {msg.text}
+                  </>
+                ) : (
+                  <>
+                    <strong>{msg.from}:</strong> {msg.text}
+                  </>
+                )}
               </div>
             ))
           )}
@@ -90,6 +86,21 @@ const Chat = ({ selectedUser }) => {
             Send
           </Button>
         </form>
+        {currentUser.isAdmin && (
+          <form onSubmit={handleAnnouncement} className="flex gap-2 mt-2">
+            <Input
+              type="text"
+              value={announcement}
+              onChange={(e) => setAnnouncement(e.target.value)}
+              placeholder="Type an announcement..."
+              className="flex-grow"
+            />
+            <Button type="submit" variant="secondary">
+              <MegaphoneIcon className="h-4 w-4 mr-2" />
+              Announce
+            </Button>
+          </form>
+        )}
       </CardContent>
     </Card>
   );
