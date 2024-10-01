@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon } from 'lucide-react';
+import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon } from 'lucide-react';
 
 const Navbar = () => {
   const { currentUser, logout } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -16,11 +18,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="bg-white dark:bg-gray-800 shadow-md">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="flex items-center space-x-2 text-primary font-bold text-xl">
+            <Link to="/" className="flex items-center space-x-2 text-primary dark:text-primary-foreground font-bold text-xl">
               <HomeIcon className="h-6 w-6" />
               <span>Chatter Poll Connect</span>
             </Link>
@@ -34,9 +36,12 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            <Button onClick={toggleTheme} variant="ghost" size="icon">
+              {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
+            </Button>
             {currentUser ? (
               <>
-                <span className="text-gray-600">{currentUser.email}</span>
+                <span className="text-gray-600 dark:text-gray-300">{currentUser.email}</span>
                 <Button onClick={handleLogout} variant="outline">Logout</Button>
               </>
             ) : (
@@ -52,7 +57,7 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, icon, text }) => (
-  <Link to={to} className="flex items-center space-x-1 text-gray-600 hover:text-primary transition-colors duration-200">
+  <Link to={to} className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors duration-200">
     {icon}
     <span>{text}</span>
   </Link>
