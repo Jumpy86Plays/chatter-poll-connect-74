@@ -12,7 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser } = useAuth();
+  const { currentUser, userVotes } = useAuth();
 
   const handleVote = (e) => {
     e.preventDefault();
@@ -28,6 +28,8 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
     name: option,
     votes: poll.votes[option] || 0
   }));
+
+  const pollUserVotes = userVotes[poll.id] || {};
 
   return (
     <Card className="max-w-2xl mx-auto dark:bg-gray-800">
@@ -105,6 +107,17 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                   <Bar dataKey="votes" fill="#8884d8" />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">User Votes</h3>
+              <ul className="space-y-2">
+                {Object.entries(pollUserVotes).map(([user, vote]) => (
+                  <li key={user} className="flex justify-between items-center">
+                    <span className="dark:text-gray-300">{user}</span>
+                    <span className="font-semibold dark:text-white">{vote}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </>
         )}

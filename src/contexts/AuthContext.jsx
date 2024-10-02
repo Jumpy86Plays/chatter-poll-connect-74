@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
   const [voters, setVoters] = useState([]);
   const [polls, setPolls] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [userVotes, setUserVotes] = useState({});
 
   useEffect(() => {
     if (currentUser) {
@@ -107,6 +108,10 @@ export function AuthProvider({ children }) {
       return poll;
     }));
     addVoter(currentUser.email);
+    setUserVotes(prev => ({
+      ...prev,
+      [pollId]: { ...prev[pollId], [currentUser.email]: option }
+    }));
   }
 
   function addOption(pollId, option) {
@@ -187,6 +192,7 @@ export function AuthProvider({ children }) {
     messages,
     sendMessage,
     sendAnnouncement,
+    userVotes,
   };
 
   return (
