@@ -9,39 +9,39 @@ const Home = () => {
   const { currentUser } = useAuth();
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-8 text-center text-primary">Welcome to Chatter Poll Connect</h1>
+    <div className="container mx-auto px-4 py-12 animate-fade-in">
+      <h1 className="text-4xl font-bold mb-8 text-center text-primary dark:text-primary-foreground text-shadow">Welcome to Chatter Poll Connect</h1>
       {currentUser && (
-        <p className="text-center text-xl mb-8">
-          Welcome back, <span className="font-semibold">{currentUser.email}</span>!
+        <p className="text-center text-xl mb-8 text-content">
+          Welcome back, <span className="font-semibold text-primary dark:text-primary-foreground">{currentUser.email}</span>!
         </p>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        <Card className="shadow-lg transform hover:scale-105 transition-transform duration-200">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-500">
-            <CardTitle className="text-2xl text-white flex items-center">
+        <Card className="shadow-lg transform hover:scale-105 transition-all duration-300 border-gradient">
+          <CardHeader className="gradient-bg text-white">
+            <CardTitle className="text-2xl flex items-center">
               <MessageCircleIcon className="mr-2" />
               Chat with Others
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <p className="mb-4 text-gray-600">Join our vibrant community and engage in real-time conversations with users from around the world.</p>
+          <CardContent className="p-6 glass-effect">
+            <p className="mb-4 text-content">Join our vibrant community and engage in real-time conversations with users from around the world.</p>
             <Link to="/chat">
-              <Button className="w-full">Go to Chat</Button>
+              <Button className="w-full hover:shadow-lg transition-shadow duration-200">Go to Chat</Button>
             </Link>
           </CardContent>
         </Card>
-        <Card className="shadow-lg transform hover:scale-105 transition-transform duration-200">
-          <CardHeader className="bg-gradient-to-r from-green-500 to-teal-500">
-            <CardTitle className="text-2xl text-white flex items-center">
+        <Card className="shadow-lg transform hover:scale-105 transition-all duration-300 border-gradient">
+          <CardHeader className="gradient-bg text-white">
+            <CardTitle className="text-2xl flex items-center">
               <BarChartIcon className="mr-2" />
               Participate in Polls
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <p className="mb-4 text-gray-600">Make your voice heard! Vote on exciting topics and see real-time results of community opinions.</p>
+          <CardContent className="p-6 glass-effect">
+            <p className="mb-4 text-content">Make your voice heard! Vote on exciting topics and see real-time results of community opinions.</p>
             <Link to="/poll">
-              <Button className="w-full">Go to Polls</Button>
+              <Button className="w-full hover:shadow-lg transition-shadow duration-200">Go to Polls</Button>
             </Link>
           </CardContent>
         </Card>
