@@ -51,6 +51,9 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'primary-dark': 'hsl(var(--primary-dark))',
+        'telegram-blue': '#2AABEE',
+        'telegram-blue-dark': '#229ED9',
       },
       borderRadius: {
         lg: "var(--radius)",
