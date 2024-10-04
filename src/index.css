@@ -117,7 +117,7 @@
 }
 
 .border-gradient {
-  border-image: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary')) 1;
+  border-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary))) 1;
 }
 
 .animate-fade-in {
