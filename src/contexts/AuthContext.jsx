@@ -47,8 +47,32 @@ export function AuthProvider({ children }) {
     };
   }, [socket]);
 
+  const addPoll = (newPoll) => {
+    const pollWithId = { ...newPoll, id: Date.now().toString(), votes: {} };
+    setPolls(prevPolls => [...prevPolls, pollWithId]);
+    if (socket) {
+      socket.emit('new_poll', pollWithId);
+    }
+  };
+
+  const vote = (pollId, option) => {
+    setPolls(prevPolls => prevPolls.map(poll => {
+      if (poll.id === pollId) {
+        const updatedVotes = { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 };
+        return { ...poll, votes: updatedVotes };
+      }
+      return poll;
+    }));
+    setUserVotes(prevVotes => ({
+      ...prevVotes,
+      [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
+    }));
+    if (socket) {
+      socket.emit('vote', { pollId, option, user: currentUser.email });
+    }
+  };
+
   const login = (email, password) => {
-  function login(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (email === 'admin@gmail.com' && password === 'admin123') {
@@ -69,10 +93,8 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
-  };
 
   const signIn = (email, password) => {
-  function signIn(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const user = { email, isAdmin: false };
@@ -83,10 +105,8 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
-  };
 
   const logout = () => {
-  function logout() {
     return new Promise((resolve) => {
       setTimeout(() => {
         setCurrentUser(null);
@@ -100,54 +120,26 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
-  };
 
   const removeUser = (email) => {
     setLoggedInUsers(prev => prev.filter(user => user !== email));
     setOnlineUsers(prev => prev.filter(user => user !== email));
-    // In a real application, you would also need to remove the user from the backend
   };
 
   const addVoter = (voter) => {
     setVoters(prev => [...prev, voter]);
   };
 
-  const addPoll = (newPoll) => {
-  function addPoll(newPoll) {
-    setPolls(prev => [...prev, { ...newPoll, id: Date.now().toString(), totalVotes: 0 }]);
-  }
-  };
-
-  const vote = (pollId, option) => {
-  function vote(pollId, option) {
-    setPolls(prev => prev.map(poll => {
-      if (poll.id === pollId) {
-        const updatedVotes = { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 };
-        return { ...poll, votes: updatedVotes, totalVotes: poll.totalVotes + 1 };
-      }
-      return poll;
-    }));
-    addVoter(currentUser.email);
-    setUserVotes(prev => ({
-      ...prev,
-      [pollId]: { ...prev[pollId], [currentUser.email]: option }
-    }));
-  }
-  };
-
   const addOption = (pollId, option) => {
-  function addOption(pollId, option) {
     setPolls(prev => prev.map(poll => {
       if (poll.id === pollId) {
         return { ...poll, options: [...poll.options, option] };
       }
       return poll;
     }));
-  }
   };
 
   const removeOption = (pollId, option) => {
-  function removeOption(pollId, option) {
     setPolls(prev => prev.map(poll => {
       if (poll.id === pollId) {
         const updatedOptions = poll.options.filter(o => o !== option);
@@ -161,11 +153,9 @@ export function AuthProvider({ children }) {
       }
       return poll;
     }));
-  }
   };
 
   const sendMessage = (text, to) => {
-  function sendMessage(text, to) {
     const newMessage = {
       from: currentUser.email,
       to,
@@ -177,11 +167,9 @@ export function AuthProvider({ children }) {
     if (socket) {
       socket.emit('chat message', newMessage);
     }
-  }
   };
 
   const sendAnnouncement = (text) => {
-  function sendAnnouncement(text) {
     const newAnnouncement = {
       from: currentUser.email,
       text,
@@ -192,7 +180,6 @@ export function AuthProvider({ children }) {
     if (socket) {
       socket.emit('chat message', newAnnouncement);
     }
-  }
   };
 
   useEffect(() => {

@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircleIcon, MinusCircleIcon } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
-const AddPoll = ({ onAddPoll }) => {
+const AddPoll = () => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
+  const { addPoll } = useAuth();
 
   const handleAddOption = () => {
     setOptions([...options, '']);
@@ -25,7 +27,7 @@ const AddPoll = ({ onAddPoll }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (question && options.every(option => option.trim() !== '')) {
-      onAddPoll({
+      addPoll({
         question,
         options: options.filter(option => option.trim() !== ''),
         votes: {}
