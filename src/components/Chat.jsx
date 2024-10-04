@@ -53,7 +53,7 @@ const Chat = () => {
                 key={index}
                 className={`mb-2 p-2 rounded-lg ${
                   msg.isAnnouncement
-                    ? 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-yellow-200 text-yellow-900 border-2 border-yellow-400 shadow-md'
                     : msg.from === currentUser.email
                     ? 'bg-primary text-white self-end'
                     : 'bg-gray-100 text-gray-800 self-start'
@@ -62,7 +62,7 @@ const Chat = () => {
                 {msg.isAnnouncement ? (
                   <>
                     <MegaphoneIcon className="inline mr-2" />
-                    <strong>Announcement:</strong> {msg.text}
+                    <strong className="text-lg">Announcement:</strong> {msg.text}
                   </>
                 ) : (
                   <>
