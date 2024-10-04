@@ -4,11 +4,7 @@ import io from 'socket.io-client';
 const AuthContext = createContext();
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
@@ -16,6 +12,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
   const [loggedInUsers, setLoggedInUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [voters, setVoters] = useState([]);
   const [polls, setPolls] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -25,7 +22,11 @@ export function AuthProvider({ children }) {
     if (currentUser) {
       const newSocket = io('http://localhost:3000');
       setSocket(newSocket);
-      return () => newSocket.close();
+      newSocket.emit('user_connected', currentUser.email);
+      return () => {
+        newSocket.emit('user_disconnected', currentUser.email);
+        newSocket.close();
+      };
     }
   }, [currentUser]);
 
@@ -34,14 +35,19 @@ export function AuthProvider({ children }) {
       socket.on('chat message', (msg) => {
         setMessages((prevMessages) => [...prevMessages, msg]);
       });
+      socket.on('update_online_users', (users) => {
+        setOnlineUsers(users);
+      });
     }
     return () => {
       if (socket) {
         socket.off('chat message');
+        socket.off('update_online_users');
       }
     };
   }, [socket]);
 
+  const login = (email, password) => {
   function login(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -63,7 +69,9 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
+  };
 
+  const signIn = (email, password) => {
   function signIn(email, password) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -75,7 +83,9 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
+  };
 
+  const logout = () => {
   function logout() {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -90,15 +100,25 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   }
+  };
 
-  function addVoter(voter) {
+  const removeUser = (email) => {
+    setLoggedInUsers(prev => prev.filter(user => user !== email));
+    setOnlineUsers(prev => prev.filter(user => user !== email));
+    // In a real application, you would also need to remove the user from the backend
+  };
+
+  const addVoter = (voter) => {
     setVoters(prev => [...prev, voter]);
-  }
+  };
 
+  const addPoll = (newPoll) => {
   function addPoll(newPoll) {
     setPolls(prev => [...prev, { ...newPoll, id: Date.now().toString(), totalVotes: 0 }]);
   }
+  };
 
+  const vote = (pollId, option) => {
   function vote(pollId, option) {
     setPolls(prev => prev.map(poll => {
       if (poll.id === pollId) {
@@ -113,7 +133,9 @@ export function AuthProvider({ children }) {
       [pollId]: { ...prev[pollId], [currentUser.email]: option }
     }));
   }
+  };
 
+  const addOption = (pollId, option) => {
   function addOption(pollId, option) {
     setPolls(prev => prev.map(poll => {
       if (poll.id === pollId) {
@@ -122,7 +144,9 @@ export function AuthProvider({ children }) {
       return poll;
     }));
   }
+  };
 
+  const removeOption = (pollId, option) => {
   function removeOption(pollId, option) {
     setPolls(prev => prev.map(poll => {
       if (poll.id === pollId) {
@@ -138,7 +162,9 @@ export function AuthProvider({ children }) {
       return poll;
     }));
   }
+  };
 
+  const sendMessage = (text, to) => {
   function sendMessage(text, to) {
     const newMessage = {
       from: currentUser.email,
@@ -152,7 +178,9 @@ export function AuthProvider({ children }) {
       socket.emit('chat message', newMessage);
     }
   }
+  };
 
+  const sendAnnouncement = (text) => {
   function sendAnnouncement(text) {
     const newAnnouncement = {
       from: currentUser.email,
@@ -165,6 +193,7 @@ export function AuthProvider({ children }) {
       socket.emit('chat message', newAnnouncement);
     }
   }
+  };
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -180,8 +209,10 @@ export function AuthProvider({ children }) {
     login,
     signIn,
     logout,
+    removeUser,
     socket,
     loggedInUsers,
+    onlineUsers,
     voters,
     addVoter,
     polls,

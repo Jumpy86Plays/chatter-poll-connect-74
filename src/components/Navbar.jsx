@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon } from 'lucide-react';
+import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon, WifiIcon } from 'lucide-react';
 
 const Navbar = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, onlineUsers } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
@@ -39,6 +39,14 @@ const Navbar = () => {
             <Button onClick={toggleTheme} variant="ghost" size="icon">
               {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
             </Button>
+            {currentUser && (
+              <div className="flex items-center space-x-2">
+                <WifiIcon className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {onlineUsers.length} online
+                </span>
+              </div>
+            )}
             {currentUser ? (
               <>
                 <span className="text-gray-600 dark:text-gray-300">{currentUser.email}</span>
