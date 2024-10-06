@@ -78,13 +78,13 @@ export function AuthProvider({ children }) {
         if (email === 'admin@gmail.com' && password === 'admin123') {
           const user = { email, isAdmin: true };
           setCurrentUser(user);
-          setLoggedInUsers(prev => [...prev, email]);
+          updateLoggedInUsers(email);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
         } else if (email === 'user@example.com' && password === 'password') {
           const user = { email, isAdmin: false };
           setCurrentUser(user);
-          setLoggedInUsers(prev => [...prev, email]);
+          updateLoggedInUsers(email);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
         } else {
@@ -99,18 +99,29 @@ export function AuthProvider({ children }) {
       setTimeout(() => {
         const user = { email, isAdmin: false };
         setCurrentUser(user);
-        setLoggedInUsers(prev => [...prev, email]);
+        updateLoggedInUsers(email);
         localStorage.setItem('user', JSON.stringify(user));
         resolve(user);
       }, 1000);
     });
   }
 
+  const updateLoggedInUsers = (email) => {
+    setLoggedInUsers(prev => {
+      if (!prev.includes(email)) {
+        return [...prev, email];
+      }
+      return prev;
+    });
+  }
+
   const logout = () => {
     return new Promise((resolve) => {
       setTimeout(() => {
+        if (currentUser) {
+          setLoggedInUsers(prev => prev.filter(user => user !== currentUser.email));
+        }
         setCurrentUser(null);
-        setLoggedInUsers(prev => prev.filter(user => user !== currentUser.email));
         localStorage.removeItem('user');
         if (socket) {
           socket.close();
@@ -186,7 +197,7 @@ export function AuthProvider({ children }) {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setCurrentUser(user);
-      setLoggedInUsers(prev => [...prev, user.email]);
+      updateLoggedInUsers(user.email);
     }
     setLoading(false);
   }, []);
