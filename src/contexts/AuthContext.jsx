@@ -47,30 +47,14 @@ export function AuthProvider({ children }) {
     };
   }, [socket]);
 
-  const addPoll = (newPoll) => {
-    const pollWithId = { ...newPoll, id: Date.now().toString(), votes: {} };
-    setPolls(prevPolls => [...prevPolls, pollWithId]);
-    if (socket) {
-      socket.emit('new_poll', pollWithId);
-    }
-  };
-
-  const vote = (pollId, option) => {
-    setPolls(prevPolls => prevPolls.map(poll => {
-      if (poll.id === pollId) {
-        const updatedVotes = { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 };
-        return { ...poll, votes: updatedVotes };
+  const updateLoggedInUsers = (email) => {
+    setLoggedInUsers(prev => {
+      if (!prev.includes(email)) {
+        return [...prev, email];
       }
-      return poll;
-    }));
-    setUserVotes(prevVotes => ({
-      ...prevVotes,
-      [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
-    }));
-    if (socket) {
-      socket.emit('vote', { pollId, option, user: currentUser.email });
-    }
-  };
+      return prev;
+    });
+  }
 
   const login = (email, password) => {
     return new Promise((resolve, reject) => {
@@ -103,15 +87,6 @@ export function AuthProvider({ children }) {
         localStorage.setItem('user', JSON.stringify(user));
         resolve(user);
       }, 1000);
-    });
-  }
-
-  const updateLoggedInUsers = (email) => {
-    setLoggedInUsers(prev => {
-      if (!prev.includes(email)) {
-        return [...prev, email];
-      }
-      return prev;
     });
   }
 

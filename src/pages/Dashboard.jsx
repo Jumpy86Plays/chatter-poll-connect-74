@@ -29,24 +29,28 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {loggedInUsers.map((user, index) => (
-                <li key={index} className="flex items-center justify-between">
-                  <span className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-primary" />
-                    {user}
-                  </span>
-                  <Button
-                    onClick={() => handleRemoveUser(user)}
-                    variant="destructive"
-                    size="sm"
-                  >
-                    <UserXIcon className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
-                </li>
-              ))}
-            </ul>
+            {loggedInUsers.length === 0 ? (
+              <p>No users currently logged in.</p>
+            ) : (
+              <ul className="space-y-2">
+                {loggedInUsers.map((user, index) => (
+                  <li key={index} className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <UserIcon className="h-4 w-4 mr-2 text-primary" />
+                      {user}
+                    </span>
+                    <Button
+                      onClick={() => handleRemoveUser(user)}
+                      variant="destructive"
+                      size="sm"
+                    >
+                      <UserXIcon className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -57,14 +61,18 @@ const Dashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {onlineUsers.map((user, index) => (
-                <li key={index} className="flex items-center">
-                  <WifiIcon className="h-4 w-4 mr-2 text-green-500" />
-                  {user}
-                </li>
-              ))}
-            </ul>
+            {onlineUsers.length === 0 ? (
+              <p>No users currently online.</p>
+            ) : (
+              <ul className="space-y-2">
+                {onlineUsers.map((user, index) => (
+                  <li key={index} className="flex items-center">
+                    <WifiIcon className="h-4 w-4 mr-2 text-green-500" />
+                    {user}
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </div>
