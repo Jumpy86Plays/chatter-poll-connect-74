@@ -34,16 +34,6 @@ export function AuthProvider({ children }) {
         setOnlineUsers(users);
       });
 
-      newSocket.on('new_message', (message) => {
-        setMessages(prevMessages => [...prevMessages, message]);
-      });
-
-      newSocket.on('poll_update', (updatedPoll) => {
-        setPolls(prevPolls => prevPolls.map(poll => 
-          poll.id === updatedPoll.id ? updatedPoll : poll
-        ));
-      });
-
       return () => {
         newSocket.emit('user_disconnected', currentUser.email);
         newSocket.close();
@@ -60,7 +50,6 @@ export function AuthProvider({ children }) {
     });
   };
 
-  const login = (email, password) => {
   const login = (email, password) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -82,11 +71,9 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   };
-  };
 
-  const signIn = login;
+  const signIn = login; // Use the same function for sign-in
 
-  const logout = () => {
   const logout = () => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -103,58 +90,40 @@ export function AuthProvider({ children }) {
       }, 1000);
     });
   };
-  };
 
-  const removeUser = (email) => {
   const removeUser = (email) => {
     setLoggedInUsers(prev => prev.filter(user => user !== email));
     setOnlineUsers(prev => prev.filter(user => user !== email));
-  };
   };
 
   const sendMessage = (text, to) => {
     const newMessage = { from: currentUser.email, to, text, isAdmin: currentUser.isAdmin };
     setMessages(prev => [...prev, newMessage]);
-    if (socket) {
-      socket.emit('send_message', newMessage);
-    }
+    // Here you would also emit the message to the server if using real-time communication
   };
 
   const sendAnnouncement = (text) => {
     const newAnnouncement = { from: currentUser.email, text, isAnnouncement: true };
     setMessages(prev => [...prev, newAnnouncement]);
-    if (socket) {
-      socket.emit('send_announcement', newAnnouncement);
-    }
+    // Here you would also emit the announcement to the server if using real-time communication
   };
 
   const addPoll = (newPoll) => {
-    const pollWithId = { ...newPoll, id: Date.now().toString() };
-    setPolls(prevPolls => [...prevPolls, pollWithId]);
-    if (socket) {
-      socket.emit('add_poll', pollWithId);
-    }
+    setPolls(prevPolls => [...prevPolls, { ...newPoll, id: Date.now().toString() }]);
   };
 
-  const vote = (pollId, option, updatedVotes = null) => {
+  const vote = (pollId, option) => {
     setPolls(prevPolls => prevPolls.map(poll => 
       poll.id === pollId 
-        ? { 
-            ...poll, 
-            votes: updatedVotes || { 
-              ...poll.votes, 
-              [option]: (poll.votes[option] || 0) + 1 
-            }
-          }
+        ? { ...poll, votes: { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 } }
         : poll
     ));
-    if (option) {
-      setUserVotes(prevVotes => ({
-        ...prevVotes,
-        [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
-      }));
-    }
-    if (socket && option) {
+    setUserVotes(prevVotes => ({
+      ...prevVotes,
+      [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
+    }));
+    // Emit vote to server
+    if (socket) {
       socket.emit('vote', { pollId, option, user: currentUser.email });
     }
   };
@@ -165,9 +134,6 @@ export function AuthProvider({ children }) {
         ? { ...poll, options: [...poll.options, newOption] }
         : poll
     ));
-    if (socket) {
-      socket.emit('add_option', { pollId, newOption });
-    }
   };
 
   const removeOption = (pollId, optionToRemove) => {
@@ -180,9 +146,6 @@ export function AuthProvider({ children }) {
           }
         : poll
     ));
-    if (socket) {
-      socket.emit('remove_option', { pollId, optionToRemove });
-    }
   };
 
   const value = {
@@ -202,7 +165,6 @@ export function AuthProvider({ children }) {
     addOption,
     removeOption,
     userVotes,
-    socket,
   };
 
   return (

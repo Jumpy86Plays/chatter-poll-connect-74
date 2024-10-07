@@ -21,7 +21,7 @@ const Chat = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim()) {
-      sendMessage(newMessage, 'all');
+      sendMessage(newMessage, currentUser.isAdmin ? 'all' : 'admin');
       setNewMessage('');
     }
   };
@@ -34,7 +34,9 @@ const Chat = () => {
     }
   };
 
-  const filteredMessages = messages.filter(msg => msg.to === 'all' || msg.isAnnouncement || msg.from === currentUser?.email || msg.to === currentUser?.email);
+  const filteredMessages = currentUser && currentUser.isAdmin
+    ? messages
+    : messages.filter(msg => msg.from === currentUser?.email || msg.to === currentUser?.email || msg.isAnnouncement || msg.to === 'all');
 
   const latestAnnouncement = filteredMessages.filter(msg => msg.isAnnouncement).pop();
 
