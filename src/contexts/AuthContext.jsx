@@ -9,14 +9,17 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [socket, setSocket] = useState(null);
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [voters, setVoters] = useState([]);
-  const [polls, setPolls] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [userVotes, setUserVotes] = useState({});
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setCurrentUser(user);
+      updateLoggedInUsers(user.email);
+    }
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
@@ -30,23 +33,6 @@ export function AuthProvider({ children }) {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('chat message', (msg) => {
-        setMessages((prevMessages) => [...prevMessages, msg]);
-      });
-      socket.on('update_online_users', (users) => {
-        setOnlineUsers(users);
-      });
-    }
-    return () => {
-      if (socket) {
-        socket.off('chat message');
-        socket.off('update_online_users');
-      }
-    };
-  }, [socket]);
-
   const updateLoggedInUsers = (email) => {
     setLoggedInUsers(prev => {
       if (!prev.includes(email)) {
@@ -54,7 +40,7 @@ export function AuthProvider({ children }) {
       }
       return prev;
     });
-  }
+  };
 
   const login = (email, password) => {
     return new Promise((resolve, reject) => {
@@ -65,7 +51,7 @@ export function AuthProvider({ children }) {
           updateLoggedInUsers(email);
           localStorage.setItem('user', JSON.stringify(user));
           resolve(user);
-        } else if (email === 'user@example.com' && password === 'password') {
+        } else if (email && password) {
           const user = { email, isAdmin: false };
           setCurrentUser(user);
           updateLoggedInUsers(email);
@@ -76,19 +62,9 @@ export function AuthProvider({ children }) {
         }
       }, 1000);
     });
-  }
+  };
 
-  const signIn = (email, password) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const user = { email, isAdmin: false };
-        setCurrentUser(user);
-        updateLoggedInUsers(email);
-        localStorage.setItem('user', JSON.stringify(user));
-        resolve(user);
-      }, 1000);
-    });
-  }
+  const signIn = login; // Use the same function for sign-in
 
   const logout = () => {
     return new Promise((resolve) => {
@@ -105,77 +81,12 @@ export function AuthProvider({ children }) {
         resolve();
       }, 1000);
     });
-  }
+  };
 
   const removeUser = (email) => {
     setLoggedInUsers(prev => prev.filter(user => user !== email));
     setOnlineUsers(prev => prev.filter(user => user !== email));
   };
-
-  const addVoter = (voter) => {
-    setVoters(prev => [...prev, voter]);
-  };
-
-  const addOption = (pollId, option) => {
-    setPolls(prev => prev.map(poll => {
-      if (poll.id === pollId) {
-        return { ...poll, options: [...poll.options, option] };
-      }
-      return poll;
-    }));
-  };
-
-  const removeOption = (pollId, option) => {
-    setPolls(prev => prev.map(poll => {
-      if (poll.id === pollId) {
-        const updatedOptions = poll.options.filter(o => o !== option);
-        const { [option]: removedVotes, ...updatedVotes } = poll.votes;
-        return { 
-          ...poll, 
-          options: updatedOptions, 
-          votes: updatedVotes,
-          totalVotes: poll.totalVotes - (removedVotes || 0)
-        };
-      }
-      return poll;
-    }));
-  };
-
-  const sendMessage = (text, to) => {
-    const newMessage = {
-      from: currentUser.email,
-      to,
-      text,
-      isAdmin: currentUser.isAdmin,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, newMessage]);
-    if (socket) {
-      socket.emit('chat message', newMessage);
-    }
-  };
-
-  const sendAnnouncement = (text) => {
-    const newAnnouncement = {
-      from: currentUser.email,
-      text,
-      isAnnouncement: true,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages(prev => [...prev, newAnnouncement]);
-    if (socket) {
-      socket.emit('chat message', newAnnouncement);
-    }
-  };
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-      setCurrentUser(user);
-      updateLoggedInUsers(user.email);
-    }
-    setLoading(false);
-  }, []);
 
   const value = {
     currentUser,
@@ -183,25 +94,13 @@ export function AuthProvider({ children }) {
     signIn,
     logout,
     removeUser,
-    socket,
     loggedInUsers,
     onlineUsers,
-    voters,
-    addVoter,
-    polls,
-    addPoll,
-    vote,
-    addOption,
-    removeOption,
-    messages,
-    sendMessage,
-    sendAnnouncement,
-    userVotes,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

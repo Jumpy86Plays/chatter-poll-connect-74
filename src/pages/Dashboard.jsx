@@ -5,11 +5,7 @@ import { Button } from '@/components/ui/button';
 import { UserIcon, UserXIcon, WifiIcon } from 'lucide-react';
 
 const Dashboard = () => {
-  const { loggedInUsers, polls, onlineUsers, removeUser } = useAuth();
-
-  if (!loggedInUsers || !polls || !onlineUsers) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
-  }
+  const { loggedInUsers, onlineUsers, removeUser } = useAuth();
 
   const handleRemoveUser = (email) => {
     if (window.confirm(`Are you sure you want to remove ${email}?`)) {
