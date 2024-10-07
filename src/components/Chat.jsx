@@ -9,7 +9,7 @@ import { SendIcon, MegaphoneIcon, UserIcon } from 'lucide-react';
 const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
-  const { currentUser, messages, sendMessage, sendAnnouncement } = useAuth();
+  const { currentUser, messages = [], sendMessage, sendAnnouncement } = useAuth();
   const scrollAreaRef = useRef(null);
 
   useEffect(() => {
@@ -34,9 +34,9 @@ const Chat = () => {
     }
   };
 
-  const filteredMessages = currentUser.isAdmin
+  const filteredMessages = currentUser && currentUser.isAdmin
     ? messages
-    : messages.filter(msg => msg.from === currentUser.email || msg.to === currentUser.email || msg.isAnnouncement || msg.to === 'all');
+    : messages.filter(msg => msg.from === currentUser?.email || msg.to === currentUser?.email || msg.isAnnouncement || msg.to === 'all');
 
   const latestAnnouncement = filteredMessages.filter(msg => msg.isAnnouncement).pop();
 
@@ -64,7 +64,7 @@ const Chat = () => {
               <div
                 key={index}
                 className={`mb-2 p-2 rounded-lg max-w-[70%] ${
-                  msg.from === currentUser.email
+                  msg.from === currentUser?.email
                     ? 'bg-primary text-white self-end ml-auto transform hover:scale-105 transition-transform duration-200'
                     : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 self-start transform hover:scale-105 transition-transform duration-200'
                 } ${msg.isAdmin ? 'font-semibold' : ''} shadow-lg`}
@@ -88,7 +88,7 @@ const Chat = () => {
               <SendIcon className="h-4 w-4" />
             </Button>
           </form>
-          {currentUser.isAdmin && (
+          {currentUser?.isAdmin && (
             <form onSubmit={handleAnnouncement} className="flex gap-2 mt-2">
               <Input
                 type="text"

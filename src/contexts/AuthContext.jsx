@@ -12,6 +12,7 @@ export function AuthProvider({ children }) {
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState([]); // Initialize messages state
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -88,6 +89,18 @@ export function AuthProvider({ children }) {
     setOnlineUsers(prev => prev.filter(user => user !== email));
   };
 
+  const sendMessage = (text, to) => {
+    const newMessage = { from: currentUser.email, to, text, isAdmin: currentUser.isAdmin };
+    setMessages(prev => [...prev, newMessage]);
+    // Here you would also emit the message to the server if using real-time communication
+  };
+
+  const sendAnnouncement = (text) => {
+    const newAnnouncement = { from: currentUser.email, text, isAnnouncement: true };
+    setMessages(prev => [...prev, newAnnouncement]);
+    // Here you would also emit the announcement to the server if using real-time communication
+  };
+
   const value = {
     currentUser,
     login,
@@ -96,6 +109,9 @@ export function AuthProvider({ children }) {
     removeUser,
     loggedInUsers,
     onlineUsers,
+    messages,
+    sendMessage,
+    sendAnnouncement,
   };
 
   return (
