@@ -12,7 +12,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser, userVotes } = useAuth();
+  const { currentUser, userVotes = {} } = useAuth();
 
   const handleVote = (e) => {
     e.preventDefault();
@@ -22,14 +22,14 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
     }
   };
 
-  const totalVotes = Object.values(poll.votes).reduce((a, b) => a + b, 0);
+  const totalVotes = Object.values(poll.votes || {}).reduce((a, b) => a + b, 0);
 
   const chartData = poll.options.map(option => ({
     name: option,
-    votes: poll.votes[option] || 0
+    votes: (poll.votes && poll.votes[option]) || 0
   }));
 
-  const pollUserVotes = userVotes[poll.id] || {};
+  const pollUserVotes = (userVotes && userVotes[poll.id]) || {};
 
   return (
     <Card className="max-w-2xl mx-auto dark:bg-gray-800">
@@ -55,9 +55,9 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
             <div key={option} className="space-y-1">
               <div className="flex justify-between text-sm font-medium dark:text-gray-300">
                 <span>{option}</span>
-                <span>{poll.votes[option] || 0} votes</span>
+                <span>{(poll.votes && poll.votes[option]) || 0} votes</span>
               </div>
-              <Progress value={(poll.votes[option] || 0) / totalVotes * 100} className="h-2" />
+              <Progress value={totalVotes > 0 ? ((poll.votes && poll.votes[option]) || 0) / totalVotes * 100 : 0} className="h-2" />
             </div>
           ))}
         </div>
