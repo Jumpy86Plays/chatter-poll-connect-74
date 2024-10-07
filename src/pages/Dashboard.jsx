@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { UserIcon, UserXIcon, WifiIcon } from 'lucide-react';
 
 const Dashboard = () => {
-  const { loggedInUsers, onlineUsers, removeUser } = useAuth();
+  const { loggedInUsers, onlineUsers, removeUser, currentUser } = useAuth();
 
   const handleRemoveUser = (email) => {
     if (window.confirm(`Are you sure you want to remove ${email}?`)) {
@@ -34,15 +34,18 @@ const Dashboard = () => {
                     <span className="flex items-center">
                       <UserIcon className="h-4 w-4 mr-2 text-primary" />
                       {user}
+                      {user === currentUser.email && " (You)"}
                     </span>
-                    <Button
-                      onClick={() => handleRemoveUser(user)}
-                      variant="destructive"
-                      size="sm"
-                    >
-                      <UserXIcon className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
+                    {currentUser.isAdmin && user !== currentUser.email && (
+                      <Button
+                        onClick={() => handleRemoveUser(user)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <UserXIcon className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -65,6 +68,7 @@ const Dashboard = () => {
                   <li key={index} className="flex items-center">
                     <WifiIcon className="h-4 w-4 mr-2 text-green-500" />
                     {user}
+                    {user === currentUser.email && " (You)"}
                   </li>
                 ))}
               </ul>

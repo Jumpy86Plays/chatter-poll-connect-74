@@ -12,12 +12,12 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser, userVotes = {} } = useAuth();
+  const { currentUser, userVotes } = useAuth();
 
   const handleVote = (e) => {
     e.preventDefault();
     if (userVote && !currentUser.isAdmin) {
-      onVote(userVote);
+      onVote(poll.id, userVote);
       setUserVote('');
     }
   };
@@ -29,7 +29,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
     votes: (poll.votes && poll.votes[option]) || 0
   }));
 
-  const pollUserVotes = (userVotes && userVotes[poll.id]) || {};
+  const pollUserVotes = userVotes[poll.id] || {};
 
   return (
     <Card className="max-w-2xl mx-auto dark:bg-gray-800">

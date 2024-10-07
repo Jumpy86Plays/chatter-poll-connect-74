@@ -13,7 +13,8 @@ export function AuthProvider({ children }) {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [polls, setPolls] = useState([]); // Initialize polls state
+  const [polls, setPolls] = useState([]);
+  const [userVotes, setUserVotes] = useState({});
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -112,6 +113,10 @@ export function AuthProvider({ children }) {
         ? { ...poll, votes: { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 } }
         : poll
     ));
+    setUserVotes(prevVotes => ({
+      ...prevVotes,
+      [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
+    }));
   };
 
   const addOption = (pollId, newOption) => {
@@ -150,6 +155,7 @@ export function AuthProvider({ children }) {
     vote,
     addOption,
     removeOption,
+    userVotes,
   };
 
   return (
