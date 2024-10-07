@@ -96,19 +96,6 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
               </div>
             </div>
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Vote Distribution</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="votes" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold mb-4 dark:text-white">User Votes</h3>
               <ul className="space-y-2">
                 {Object.entries(pollUserVotes).map(([user, vote]) => (

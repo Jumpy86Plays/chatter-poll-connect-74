@@ -29,6 +29,11 @@ export function AuthProvider({ children }) {
       const newSocket = io('http://localhost:3000');
       setSocket(newSocket);
       newSocket.emit('user_connected', currentUser.email);
+
+      newSocket.on('update_online_users', (users) => {
+        setOnlineUsers(users);
+      });
+
       return () => {
         newSocket.emit('user_disconnected', currentUser.email);
         newSocket.close();
@@ -117,6 +122,10 @@ export function AuthProvider({ children }) {
       ...prevVotes,
       [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
     }));
+    // Emit vote to server
+    if (socket) {
+      socket.emit('vote', { pollId, option, user: currentUser.email });
+    }
   };
 
   const addOption = (pollId, newOption) => {
