@@ -12,7 +12,8 @@ export function AuthProvider({ children }) {
   const [loggedInUsers, setLoggedInUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
-  const [messages, setMessages] = useState([]); // Initialize messages state
+  const [messages, setMessages] = useState([]);
+  const [polls, setPolls] = useState([]); // Initialize polls state
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -101,6 +102,38 @@ export function AuthProvider({ children }) {
     // Here you would also emit the announcement to the server if using real-time communication
   };
 
+  const addPoll = (newPoll) => {
+    setPolls(prevPolls => [...prevPolls, { ...newPoll, id: Date.now().toString() }]);
+  };
+
+  const vote = (pollId, option) => {
+    setPolls(prevPolls => prevPolls.map(poll => 
+      poll.id === pollId 
+        ? { ...poll, votes: { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 } }
+        : poll
+    ));
+  };
+
+  const addOption = (pollId, newOption) => {
+    setPolls(prevPolls => prevPolls.map(poll => 
+      poll.id === pollId 
+        ? { ...poll, options: [...poll.options, newOption] }
+        : poll
+    ));
+  };
+
+  const removeOption = (pollId, optionToRemove) => {
+    setPolls(prevPolls => prevPolls.map(poll => 
+      poll.id === pollId 
+        ? { 
+            ...poll, 
+            options: poll.options.filter(option => option !== optionToRemove),
+            votes: Object.fromEntries(Object.entries(poll.votes).filter(([key]) => key !== optionToRemove))
+          }
+        : poll
+    ));
+  };
+
   const value = {
     currentUser,
     login,
@@ -112,6 +145,11 @@ export function AuthProvider({ children }) {
     messages,
     sendMessage,
     sendAnnouncement,
+    polls,
+    addPoll,
+    vote,
+    addOption,
+    removeOption,
   };
 
   return (
