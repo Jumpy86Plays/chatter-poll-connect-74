@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -12,7 +12,23 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser, userVotes } = useAuth();
+  const { currentUser, userVotes, socket } = useAuth();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('vote_update', (updatedPoll) => {
+        if (updatedPoll.id === poll.id) {
+          // Update the poll data
+          onVote(updatedPoll.id, null, updatedPoll.votes);
+        }
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off('vote_update');
+      }
+    };
+  }, [socket, poll.id, onVote]);
 
   const handleVote = (e) => {
     e.preventDefault();
@@ -105,6 +121,19 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                   </li>
                 ))}
               </ul>
+            </div>
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">Vote Distribution</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="votes" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </>
         )}
