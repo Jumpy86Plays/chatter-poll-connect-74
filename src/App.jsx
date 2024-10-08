@@ -15,7 +15,7 @@ const App = () => {
     <AuthProvider>
       <ThemeProvider>
         <Router>
-          <div className="min-h-screen bg-black text-yellow-300 font-starwars">
+          <div className="min-h-screen bg-cyberpunk-dark text-cyberpunk-blue font-cyberpunk">
             <Navbar />
             <div className="container mx-auto px-4 py-8">
               <Routes>

@@ -18,13 +18,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-black text-yellow-300 shadow-md transition-colors duration-300">
+    <nav className="bg-cyberpunk-dark text-cyberpunk-blue shadow-md transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:text-yellow-400 transition-colors duration-200">
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:text-cyberpunk-pink transition-colors duration-200">
               <HomeIcon className="h-6 w-6" />
-              <span className="text-shadow">Galactic Hub</span>
+              <span className="font-cyberpunk animate-neon-glow">Warframe Hub</span>
             </Link>
             <div className="hidden md:flex space-x-4">
               <NavLink to="/" icon={<HomeIcon className="h-4 w-4" />} text="Home" />
@@ -36,12 +36,12 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-yellow-600 hover:text-black transition-colors duration-200">
-              {isDarkMode ? <SunIcon className="h-5 w-5 text-yellow-400" /> : <MoonIcon className="h-5 w-5 text-yellow-300" />}
+            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-cyberpunk-light hover:text-cyberpunk-yellow transition-colors duration-200">
+              {isDarkMode ? <SunIcon className="h-5 w-5 text-cyberpunk-yellow" /> : <MoonIcon className="h-5 w-5 text-cyberpunk-blue" />}
             </Button>
             {currentUser && (
-              <div className="flex items-center space-x-2 bg-yellow-600 bg-opacity-20 px-3 py-1 rounded-full">
-                <WifiIcon className="h-4 w-4 text-green-400" />
+              <div className="flex items-center space-x-2 bg-cyberpunk-light bg-opacity-20 px-3 py-1 rounded-full">
+                <WifiIcon className="h-4 w-4 text-cyberpunk-green" />
                 <span className="text-sm">
                   {onlineUsers.length} online
                 </span>
@@ -49,15 +49,15 @@ const Navbar = () => {
             )}
             {currentUser ? (
               <>
-                <span>{currentUser.email}</span>
-                <Button onClick={handleLogout} variant="outline" className="bg-yellow-600 bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">
+                <span className="text-cyberpunk-pink">{currentUser.email}</span>
+                <Button onClick={handleLogout} variant="outline" className="bg-cyberpunk-light bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-cyberpunk-yellow">
                   <LogOutIcon className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
               </>
             ) : (
               <Link to="/login">
-                <Button variant="outline" className="bg-yellow-600 bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">Login</Button>
+                <Button variant="outline" className="bg-cyberpunk-light bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-cyberpunk-yellow">Login</Button>
               </Link>
             )}
           </div>
@@ -68,9 +68,9 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, icon, text }) => (
-  <Link to={to} className="flex items-center space-x-1 hover:text-yellow-400 transition-colors duration-200 hover:scale-105 transform">
+  <Link to={to} className="flex items-center space-x-1 hover:text-cyberpunk-pink transition-colors duration-200 hover:scale-105 transform">
     {icon}
-    <span>{text}</span>
+    <span className="font-cyberpunk">{text}</span>
   </Link>
 );
 
