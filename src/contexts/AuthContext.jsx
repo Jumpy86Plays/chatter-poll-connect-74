@@ -76,18 +76,17 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        if (currentUser) {
-          setLoggedInUsers(prev => prev.filter(user => user !== currentUser.email));
-        }
-        setCurrentUser(null);
-        localStorage.removeItem('user');
-        if (socket) {
-          socket.close();
-          setSocket(null);
-        }
-        resolve();
-      }, 1000);
+      if (currentUser) {
+        setLoggedInUsers(prev => prev.filter(user => user !== currentUser.email));
+      }
+      setCurrentUser(null);
+      localStorage.removeItem('user');
+      if (socket) {
+        socket.emit('user_disconnected', currentUser.email);
+        socket.close();
+        setSocket(null);
+      }
+      resolve();
     });
   };
 
@@ -99,13 +98,17 @@ export function AuthProvider({ children }) {
   const sendMessage = (text, to) => {
     const newMessage = { from: currentUser.email, to, text, isAdmin: currentUser.isAdmin };
     setMessages(prev => [...prev, newMessage]);
-    // Here you would also emit the message to the server if using real-time communication
+    if (socket) {
+      socket.emit('new_message', newMessage);
+    }
   };
 
   const sendAnnouncement = (text) => {
     const newAnnouncement = { from: currentUser.email, text, isAnnouncement: true };
     setMessages(prev => [...prev, newAnnouncement]);
-    // Here you would also emit the announcement to the server if using real-time communication
+    if (socket) {
+      socket.emit('new_announcement', newAnnouncement);
+    }
   };
 
   const addPoll = (newPoll) => {
@@ -147,6 +150,23 @@ export function AuthProvider({ children }) {
         : poll
     ));
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('receive_message', (message) => {
+        setMessages(prev => [...prev, message]);
+      });
+
+      socket.on('receive_announcement', (announcement) => {
+        setMessages(prev => [...prev, announcement]);
+      });
+
+      return () => {
+        socket.off('receive_message');
+        socket.off('receive_announcement');
+      };
+    }
+  }, [socket]);
 
   const value = {
     currentUser,

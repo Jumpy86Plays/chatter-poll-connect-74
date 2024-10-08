@@ -34,9 +34,13 @@ const Chat = () => {
     }
   };
 
-  const filteredMessages = currentUser && currentUser.isAdmin
-    ? messages
-    : messages.filter(msg => msg.from === currentUser?.email || msg.to === currentUser?.email || msg.isAnnouncement || msg.to === 'all');
+  const filteredMessages = messages.filter(msg => 
+    msg.isAnnouncement || 
+    msg.from === currentUser?.email || 
+    msg.to === currentUser?.email || 
+    msg.to === 'all' ||
+    currentUser?.isAdmin
+  );
 
   const latestAnnouncement = filteredMessages.filter(msg => msg.isAnnouncement).pop();
 
