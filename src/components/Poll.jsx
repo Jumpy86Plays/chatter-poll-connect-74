@@ -58,9 +58,14 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
         <form onSubmit={handleVote} className="space-y-4">
           <RadioGroup value={userVote} onValueChange={setUserVote}>
             {poll.options.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={option} disabled={currentUser.isAdmin} />
-                <Label htmlFor={option} className="dark:text-gray-300">{option}</Label>
+              <div key={option} className="flex items-center justify-between space-x-2">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value={option} id={option} disabled={currentUser.isAdmin} />
+                  <Label htmlFor={option} className="dark:text-gray-300">{option}</Label>
+                </div>
+                <span className="text-sm font-medium dark:text-gray-400">
+                  {(poll.votes && poll.votes[option]) || 0} vote{(poll.votes && poll.votes[option] !== 1) ? 's' : ''}
+                </span>
               </div>
             ))}
           </RadioGroup>
@@ -73,7 +78,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
             <div key={option} className="space-y-1">
               <div className="flex justify-between text-sm font-medium dark:text-gray-300">
                 <span>{option}</span>
-                <span>{(poll.votes && poll.votes[option]) || 0} votes</span>
+                <span>{(poll.votes && poll.votes[option]) || 0} vote{(poll.votes && poll.votes[option] !== 1) ? 's' : ''}</span>
               </div>
               <Progress value={totalVotes > 0 ? ((poll.votes && poll.votes[option]) || 0) / totalVotes * 100 : 0} className="h-2" />
             </div>
