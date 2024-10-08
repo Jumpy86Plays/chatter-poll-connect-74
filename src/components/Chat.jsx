@@ -54,7 +54,7 @@ const Chat = () => {
         )}
         <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
           {messages.length === 0 ? (
-            <p className="text-center text-yellow-200 text-opacity-70">No messages yet. May the Force be with you!</p>
+            <p className="text-center text-yellow-200 text-opacity-70">Swaz-dolah Tenno!</p>
           ) : (
             messages.filter(msg => !msg.isAnnouncement).map((msg, index) => (
               <div
