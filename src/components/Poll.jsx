@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircleIcon, MinusCircleIcon } from 'lucide-react';
+import { PlusCircleIcon, MinusCircleIcon, VoteIcon, UserIcon, ChartBarIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
@@ -32,9 +32,12 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const pollUserVotes = userVotes[poll.id] || {};
 
   return (
-    <Card className="max-w-2xl mx-auto bg-gray-900 text-yellow-100 border border-yellow-600">
+    <Card className="max-w-2xl mx-auto bg-black text-yellow-300 border border-yellow-600 shadow-lg shadow-yellow-500/50">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-yellow-400">{poll.question}</CardTitle>
+        <CardTitle className="text-2xl font-bold text-yellow-400 flex items-center">
+          <VoteIcon className="mr-2" />
+          {poll.question}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={handleVote} className="space-y-4">
@@ -46,7 +49,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
               </div>
             ))}
           </RadioGroup>
-          <Button type="submit" disabled={!userVote || currentUser.isAdmin} className="w-full bg-yellow-600 text-black hover:bg-yellow-700">
+          <Button type="submit" disabled={!userVote || currentUser.isAdmin} className="w-full bg-yellow-600 text-black hover:bg-yellow-700 transition-colors duration-300">
             {currentUser.isAdmin ? "Jedi Masters can't vote" : "Cast Your Vote"}
           </Button>
         </form>
@@ -64,7 +67,10 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
         {currentUser.isAdmin && (
           <>
             <div className="space-y-4 pt-4 border-t border-yellow-800">
-              <h3 className="text-lg font-semibold text-yellow-400">Jedi Council Controls</h3>
+              <h3 className="text-lg font-semibold text-yellow-400 flex items-center">
+                <UserIcon className="mr-2" />
+                Jedi Council Controls
+              </h3>
               <div className="flex space-x-2">
                 <Input
                   type="text"
@@ -78,7 +84,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                     onAddOption(poll.id, newOption.trim());
                     setNewOption('');
                   }
-                }} className="bg-green-600 hover:bg-green-700 text-black">
+                }} className="bg-green-600 hover:bg-green-700 text-black transition-colors duration-300">
                   <PlusCircleIcon className="h-4 w-4 mr-2" />
                   Add Option
                 </Button>
@@ -87,7 +93,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                 {poll.options.map((option) => (
                   <div key={option} className="flex justify-between items-center">
                     <span className="text-yellow-200">{option}</span>
-                    <Button onClick={() => onRemoveOption(poll.id, option)} variant="destructive" size="sm" className="bg-red-600 hover:bg-red-700 text-white">
+                    <Button onClick={() => onRemoveOption(poll.id, option)} variant="destructive" size="sm" className="bg-red-600 hover:bg-red-700 text-white transition-colors duration-300">
                       <MinusCircleIcon className="h-4 w-4 mr-2" />
                       Remove
                     </Button>
@@ -96,7 +102,10 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
               </div>
             </div>
             <div className="pt-4 border-t border-yellow-800">
-              <h3 className="text-lg font-semibold mb-4 text-yellow-400">Force Alignment Chart</h3>
+              <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
+                <ChartBarIcon className="mr-2" />
+                Force Alignment Chart
+              </h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#444" />
@@ -109,7 +118,10 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
               </ResponsiveContainer>
             </div>
             <div className="pt-4 border-t border-yellow-800">
-              <h3 className="text-lg font-semibold mb-4 text-yellow-400">Jedi Archives - User Votes</h3>
+              <h3 className="text-lg font-semibold mb-4 text-yellow-400 flex items-center">
+                <UserIcon className="mr-2" />
+                Jedi Archives - User Votes
+              </h3>
               <ul className="space-y-2">
                 {Object.entries(pollUserVotes).map(([user, vote]) => (
                   <li key={user} className="flex justify-between items-center">

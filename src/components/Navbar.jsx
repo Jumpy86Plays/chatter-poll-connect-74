@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
-import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon, WifiIcon } from 'lucide-react';
+import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon, WifiIcon, LogOutIcon } from 'lucide-react';
 
 const Navbar = () => {
   const { currentUser, logout, onlineUsers } = useAuth();
@@ -18,13 +18,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-gradient-start via-gradient-mid to-gradient-end text-white shadow-md transition-colors duration-300">
+    <nav className="bg-black text-yellow-300 shadow-md transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center space-x-8">
-            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:opacity-80 transition-opacity duration-200">
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:text-yellow-400 transition-colors duration-200">
               <HomeIcon className="h-6 w-6" />
-              <span className="text-shadow">Chatter Poll Connect</span>
+              <span className="text-shadow">Galactic Hub</span>
             </Link>
             <div className="hidden md:flex space-x-4">
               <NavLink to="/" icon={<HomeIcon className="h-4 w-4" />} text="Home" />
@@ -36,11 +36,11 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-white hover:bg-opacity-20 transition-colors duration-200">
-              {isDarkMode ? <SunIcon className="h-5 w-5 text-yellow-400" /> : <MoonIcon className="h-5 w-5 text-gray-200" />}
+            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-yellow-600 hover:text-black transition-colors duration-200">
+              {isDarkMode ? <SunIcon className="h-5 w-5 text-yellow-400" /> : <MoonIcon className="h-5 w-5 text-yellow-300" />}
             </Button>
             {currentUser && (
-              <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-full">
+              <div className="flex items-center space-x-2 bg-yellow-600 bg-opacity-20 px-3 py-1 rounded-full">
                 <WifiIcon className="h-4 w-4 text-green-400" />
                 <span className="text-sm">
                   {onlineUsers.length} online
@@ -50,11 +50,14 @@ const Navbar = () => {
             {currentUser ? (
               <>
                 <span>{currentUser.email}</span>
-                <Button onClick={handleLogout} variant="outline" className="bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">Logout</Button>
+                <Button onClick={handleLogout} variant="outline" className="bg-yellow-600 bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">
+                  <LogOutIcon className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
               </>
             ) : (
               <Link to="/login">
-                <Button variant="outline" className="bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">Login</Button>
+                <Button variant="outline" className="bg-yellow-600 bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200">Login</Button>
               </Link>
             )}
           </div>
@@ -65,7 +68,7 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, icon, text }) => (
-  <Link to={to} className="flex items-center space-x-1 hover:text-gray-200 transition-colors duration-200 hover:scale-105 transform">
+  <Link to={to} className="flex items-center space-x-1 hover:text-yellow-400 transition-colors duration-200 hover:scale-105 transform">
     {icon}
     <span>{text}</span>
   </Link>
