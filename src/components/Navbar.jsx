@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon, WifiIcon } from 'lucide-react';
 
 const Navbar = () => {
-  const { currentUser, logout, onlineUsers } = useAuth();
+  const { currentUser, logout, onlineUsers = [] } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
