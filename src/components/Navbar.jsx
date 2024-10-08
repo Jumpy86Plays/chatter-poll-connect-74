@@ -18,11 +18,11 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-cyberpunk-dark text-cyberpunk-blue shadow-md transition-colors duration-300">
+    <nav className="bg-background text-foreground shadow-md transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center py-4">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:text-cyberpunk-pink transition-colors duration-200">
+            <Link to="/" className="flex items-center space-x-2 font-bold text-xl hover:text-primary transition-colors duration-200">
               <HomeIcon className="h-6 w-6" />
               <span className="font-cyberpunk animate-neon-glow">Warframe Hub</span>
             </Link>
@@ -39,12 +39,12 @@ const Navbar = () => {
             )}
           </div>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-cyberpunk-light hover:text-cyberpunk-yellow transition-colors duration-200">
-              {isDarkMode ? <SunIcon className="h-5 w-5 text-cyberpunk-yellow" /> : <MoonIcon className="h-5 w-5 text-cyberpunk-blue" />}
+            <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-accent hover:text-accent-foreground transition-colors duration-200">
+              {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
             </Button>
             {currentUser && (
-              <div className="flex items-center space-x-2 bg-cyberpunk-light bg-opacity-20 px-3 py-1 rounded-full">
-                <WifiIcon className="h-4 w-4 text-cyberpunk-green" />
+              <div className="flex items-center space-x-2 bg-accent bg-opacity-20 px-3 py-1 rounded-full">
+                <WifiIcon className="h-4 w-4 text-primary" />
                 <span className="text-sm">
                   {onlineUsers.length} online
                 </span>
@@ -52,15 +52,15 @@ const Navbar = () => {
             )}
             {currentUser ? (
               <>
-                <span className="text-cyberpunk-pink">{currentUser.email}</span>
-                <Button onClick={handleLogout} variant="outline" className="bg-cyberpunk-light bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-cyberpunk-yellow">
+                <span className="text-primary">{currentUser.email}</span>
+                <Button onClick={handleLogout} variant="outline" className="bg-accent bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-primary">
                   <LogOutIcon className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
               </>
             ) : (
               <Link to="/login">
-                <Button variant="outline" className="bg-cyberpunk-light bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-cyberpunk-yellow">Login</Button>
+                <Button variant="outline" className="bg-accent bg-opacity-20 hover:bg-opacity-30 transition-colors duration-200 text-primary">Login</Button>
               </Link>
             )}
           </div>
@@ -71,14 +71,14 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, icon, text }) => (
-  <Link to={to} className="flex items-center space-x-1 hover:text-cyberpunk-pink transition-colors duration-200 hover:scale-105 transform">
+  <Link to={to} className="flex items-center space-x-1 hover:text-primary transition-colors duration-200 hover:scale-105 transform">
     {icon}
     <span className="font-cyberpunk">{text}</span>
   </Link>
 );
 
 const ExternalNavLink = ({ href, icon, text }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:text-cyberpunk-pink transition-colors duration-200 hover:scale-105 transform">
+  <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1 hover:text-primary transition-colors duration-200 hover:scale-105 transform">
     {icon}
     <span className="font-cyberpunk">{text}</span>
   </a>

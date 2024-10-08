@@ -51,12 +51,9 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'cyberpunk-blue': '#00FFFF',
-        'cyberpunk-pink': '#FF00FF',
-        'cyberpunk-yellow': '#FFFF00',
-        'cyberpunk-green': '#00FF00',
-        'cyberpunk-dark': '#0D0221',
-        'cyberpunk-light': '#3B3B98',
+        'gradient-start': '#1E3A8A',
+        'gradient-mid': '#3B82F6',
+        'gradient-end': '#60A5FA',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -77,8 +74,8 @@ module.exports = {
           '50%': { opacity: 0.5 },
         },
         "neon-glow": {
-          '0%, 100%': { textShadow: '0 0 5px #00FFFF, 0 0 10px #00FFFF, 0 0 15px #00FFFF, 0 0 20px #00FFFF' },
-          '50%': { textShadow: '0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF, 0 0 40px #FF00FF' },
+          '0%, 100%': { textShadow: '0 0 5px #3B82F6, 0 0 10px #3B82F6, 0 0 15px #3B82F6, 0 0 20px #3B82F6' },
+          '50%': { textShadow: '0 0 10px #60A5FA, 0 0 20px #60A5FA, 0 0 30px #60A5FA, 0 0 40px #60A5FA' },
         },
       },
       animation: {
