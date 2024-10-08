@@ -6,19 +6,12 @@ import { Button } from '@/components/ui/button';
 import { HomeIcon, MessageCircleIcon, BarChartIcon, LayoutDashboardIcon, SunIcon, MoonIcon, WifiIcon } from 'lucide-react';
 
 const Navbar = () => {
-  const auth = useAuth();
+  const { currentUser, logout, onlineUsers } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
-
-  // Check if auth is undefined before destructuring
-  const currentUser = auth?.currentUser;
-  const logout = auth?.logout;
-  const onlineUsers = auth?.onlineUsers || [];
 
   const handleLogout = async () => {
     try {
-      if (logout) {
-        await logout();
-      }
+      await logout();
     } catch (error) {
       console.error('Failed to log out', error);
     }
