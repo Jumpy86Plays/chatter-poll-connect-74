@@ -10,15 +10,33 @@ import { PlusCircleIcon, MinusCircleIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
-  const [selectedOption, setSelectedOption] = useState('');
+  const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser } = useAuth();
+  const { currentUser, userVotes, socket } = useAuth();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('vote_update', (updatedPoll) => {
+        if (updatedPoll.id === poll.id) {
+          onVote(updatedPoll.id, updatedPoll.lastVote, updatedPoll.votes);
+        }
+      });
+    }
+    return () => {
+      if (socket) {
+        socket.off('vote_update');
+      }
+    };
+  }, [socket, poll.id, onVote]);
 
   const handleVote = (e) => {
     e.preventDefault();
-    if (selectedOption && !currentUser.isAdmin) {
-      onVote(poll.id, selectedOption);
-      setSelectedOption('');
+    if (userVote && !currentUser.isAdmin) {
+      onVote(poll.id, userVote);
+      setUserVote('');
+      if (socket) {
+        socket.emit('vote', { pollId: poll.id, option: userVote, user: currentUser.email });
+      }
     }
   };
 
@@ -29,6 +47,8 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
     votes: (poll.votes && poll.votes[option]) || 0
   }));
 
+  const pollUserVotes = userVotes[poll.id] || {};
+
   return (
     <Card className="max-w-2xl mx-auto dark:bg-gray-800">
       <CardHeader>
@@ -36,7 +56,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={handleVote} className="space-y-4">
-          <RadioGroup value={selectedOption} onValueChange={setSelectedOption}>
+          <RadioGroup value={userVote} onValueChange={setUserVote}>
             {poll.options.map((option) => (
               <div key={option} className="flex items-center justify-between space-x-2">
                 <div className="flex items-center space-x-2">
@@ -49,7 +69,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
               </div>
             ))}
           </RadioGroup>
-          <Button type="submit" disabled={!selectedOption || currentUser.isAdmin} className="w-full">
+          <Button type="submit" disabled={!userVote || currentUser.isAdmin} className="w-full">
             {currentUser.isAdmin ? "Admins can't vote" : "Vote"}
           </Button>
         </form>
@@ -97,6 +117,17 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">User Votes</h3>
+              <ul className="space-y-2">
+                {Object.entries(pollUserVotes).map(([user, vote]) => (
+                  <li key={user} className="flex justify-between items-center">
+                    <span className="dark:text-gray-300">{user}</span>
+                    <span className="font-semibold dark:text-white">{vote}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold mb-4 dark:text-white">Vote Distribution</h3>
