@@ -34,24 +34,6 @@ export function AuthProvider({ children }) {
         setOnlineUsers(users);
       });
 
-      newSocket.on('receive_message', (message) => {
-        setMessages(prev => [...prev, message]);
-      });
-
-      newSocket.on('receive_announcement', (announcement) => {
-        setMessages(prev => [...prev, announcement]);
-      });
-
-      newSocket.on('vote_update', (updatedPoll) => {
-        setPolls(prev => prev.map(poll => 
-          poll.id === updatedPoll.id ? { ...poll, votes: updatedPoll.votes } : poll
-        ));
-        setUserVotes(prev => ({
-          ...prev,
-          [updatedPoll.id]: { ...prev[updatedPoll.id], [updatedPoll.user]: updatedPoll.lastVote }
-        }));
-      });
-
       return () => {
         newSocket.emit('user_disconnected', currentUser.email);
         newSocket.close();
@@ -90,7 +72,7 @@ export function AuthProvider({ children }) {
     });
   };
 
-  const signIn = login;
+  const signIn = login; // Use the same function for sign-in
 
   const logout = () => {
     return new Promise((resolve) => {
@@ -133,16 +115,17 @@ export function AuthProvider({ children }) {
     setPolls(prevPolls => [...prevPolls, { ...newPoll, id: Date.now().toString() }]);
   };
 
-  const vote = (pollId, option, votes) => {
+  const vote = (pollId, option) => {
     setPolls(prevPolls => prevPolls.map(poll => 
       poll.id === pollId 
-        ? { ...poll, votes: votes || { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 } }
+        ? { ...poll, votes: { ...poll.votes, [option]: (poll.votes[option] || 0) + 1 } }
         : poll
     ));
     setUserVotes(prevVotes => ({
       ...prevVotes,
       [pollId]: { ...prevVotes[pollId], [currentUser.email]: option }
     }));
+    // Emit vote to server
     if (socket) {
       socket.emit('vote', { pollId, option, user: currentUser.email });
     }
@@ -168,6 +151,23 @@ export function AuthProvider({ children }) {
     ));
   };
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('receive_message', (message) => {
+        setMessages(prev => [...prev, message]);
+      });
+
+      socket.on('receive_announcement', (announcement) => {
+        setMessages(prev => [...prev, announcement]);
+      });
+
+      return () => {
+        socket.off('receive_message');
+        socket.off('receive_announcement');
+      };
+    }
+  }, [socket]);
+
   const value = {
     currentUser,
     login,
@@ -185,7 +185,6 @@ export function AuthProvider({ children }) {
     addOption,
     removeOption,
     userVotes,
-    socket,
   };
 
   return (

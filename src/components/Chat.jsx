@@ -9,7 +9,7 @@ import { SendIcon, MegaphoneIcon, UserIcon } from 'lucide-react';
 const Chat = () => {
   const [newMessage, setNewMessage] = useState('');
   const [announcement, setAnnouncement] = useState('');
-  const { currentUser, messages = [], sendMessage, sendAnnouncement, socket } = useAuth();
+  const { currentUser, messages = [], sendMessage, sendAnnouncement } = useAuth();
   const scrollAreaRef = useRef(null);
 
   useEffect(() => {
@@ -18,27 +18,10 @@ const Chat = () => {
     }
   }, [messages]);
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('receive_message', (message) => {
-        setMessages(prev => [...prev, message]);
-      });
-
-      socket.on('receive_announcement', (announcement) => {
-        setMessages(prev => [...prev, announcement]);
-      });
-
-      return () => {
-        socket.off('receive_message');
-        socket.off('receive_announcement');
-      };
-    }
-  }, [socket]);
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newMessage.trim()) {
-      sendMessage(newMessage, 'all');
+      sendMessage(newMessage, currentUser.isAdmin ? 'all' : 'admin');
       setNewMessage('');
     }
   };
@@ -51,27 +34,44 @@ const Chat = () => {
     }
   };
 
+  const filteredMessages = messages.filter(msg => 
+    msg.isAnnouncement || 
+    msg.from === currentUser?.email || 
+    msg.to === currentUser?.email || 
+    msg.to === 'all' ||
+    currentUser?.isAdmin
+  );
+
+  const latestAnnouncement = filteredMessages.filter(msg => msg.isAnnouncement).pop();
+
   return (
     <Card className="h-[600px] flex flex-col bg-gradient-to-br from-gradient-start via-gradient-mid to-gradient-end">
       <CardHeader className="bg-primary text-white rounded-t-lg">
         <CardTitle className="text-2xl font-bold flex items-center">
           <UserIcon className="mr-2" />
-          Group Chat
+          Chat Room
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col p-0">
+        {latestAnnouncement && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 p-3 border-b border-yellow-300 dark:border-yellow-700 animate-pulse">
+            <MegaphoneIcon className="inline mr-2 text-yellow-600 dark:text-yellow-400" />
+            <strong className="text-lg text-yellow-800 dark:text-yellow-200">Announcement:</strong>
+            <span className="ml-2 text-yellow-900 dark:text-yellow-100">{latestAnnouncement.text}</span>
+          </div>
+        )}
         <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-          {messages.length === 0 ? (
+          {filteredMessages.length === 0 ? (
             <p className="text-center text-white text-opacity-70">No messages yet. Start a conversation!</p>
           ) : (
-            messages.map((msg, index) => (
+            filteredMessages.filter(msg => !msg.isAnnouncement).map((msg, index) => (
               <div
                 key={index}
                 className={`mb-2 p-2 rounded-lg max-w-[70%] ${
                   msg.from === currentUser?.email
-                    ? 'bg-primary text-white self-end ml-auto'
-                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 self-start'
-                } ${msg.isAdmin ? 'font-semibold' : ''} ${msg.isAnnouncement ? 'bg-yellow-500 text-white w-full max-w-full' : ''} shadow-lg`}
+                    ? 'bg-primary text-white self-end ml-auto transform hover:scale-105 transition-transform duration-200'
+                    : 'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 self-start transform hover:scale-105 transition-transform duration-200'
+                } ${msg.isAdmin ? 'font-semibold' : ''} shadow-lg`}
               >
                 <div className="text-xs opacity-75 mb-1">{msg.from}</div>
                 <div>{msg.text}</div>

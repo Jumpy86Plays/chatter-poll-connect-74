@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -12,31 +12,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
   const [userVote, setUserVote] = useState('');
   const [newOption, setNewOption] = useState('');
-  const { currentUser, userVotes, socket } = useAuth();
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('vote_update', (updatedPoll) => {
-        if (updatedPoll.id === poll.id) {
-          onVote(updatedPoll.id, updatedPoll.lastVote, updatedPoll.votes);
-        }
-      });
-    }
-    return () => {
-      if (socket) {
-        socket.off('vote_update');
-      }
-    };
-  }, [socket, poll.id, onVote]);
+  const { currentUser, userVotes } = useAuth();
 
   const handleVote = (e) => {
     e.preventDefault();
     if (userVote && !currentUser.isAdmin) {
       onVote(poll.id, userVote);
       setUserVote('');
-      if (socket) {
-        socket.emit('vote', { pollId: poll.id, option: userVote, user: currentUser.email });
-      }
     }
   };
 
@@ -93,7 +75,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                 />
                 <Button onClick={() => {
                   if (newOption.trim()) {
-                    onAddOption(poll.id, newOption.trim());
+                    onAddOption(newOption.trim());
                     setNewOption('');
                   }
                 }}>
@@ -105,7 +87,7 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                 {poll.options.map((option) => (
                   <div key={option} className="flex justify-between items-center">
                     <span className="dark:text-gray-300">{option}</span>
-                    <Button onClick={() => onRemoveOption(poll.id, option)} variant="destructive" size="sm">
+                    <Button onClick={() => onRemoveOption(option)} variant="destructive" size="sm">
                       <MinusCircleIcon className="h-4 w-4 mr-2" />
                       Remove
                     </Button>
@@ -123,19 +105,6 @@ const Poll = ({ poll, onVote, onAddOption, onRemoveOption }) => {
                   </li>
                 ))}
               </ul>
-            </div>
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">Vote Distribution</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="votes" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
             </div>
           </>
         )}
