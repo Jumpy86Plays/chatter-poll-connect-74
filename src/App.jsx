@@ -15,43 +15,19 @@ const App = () => {
     <AuthProvider>
       <ThemeProvider>
         <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <Home />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/chat"
-              element={
-                <PrivateRoute>
-                  <ChatPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/poll"
-              element={
-                <PrivateRoute>
-                  <PollPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+                <Route path="/chat" element={<PrivateRoute><ChatPage /></PrivateRoute>} />
+                <Route path="/poll" element={<PrivateRoute><PollPage /></PrivateRoute>} />
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+          </div>
         </Router>
       </ThemeProvider>
     </AuthProvider>

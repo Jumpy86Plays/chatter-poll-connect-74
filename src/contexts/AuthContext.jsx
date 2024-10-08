@@ -12,19 +12,27 @@ export function AuthProvider({ children }) {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [polls, setPolls] = useState([]);
-  const [userVotes, setUserVotes] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       setCurrentUser(user);
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     if (currentUser) {
-      const newSocket = io('http://localhost:3000');
+      const newSocket = io('http://localhost:3000', {
+        transports: ['websocket'],
+        upgrade: false
+      });
       setSocket(newSocket);
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+      });
 
       newSocket.on('receive_message', (message) => {
         setMessages(prev => [...prev, message]);
@@ -154,9 +162,13 @@ export function AuthProvider({ children }) {
     vote,
     addOption,
     removeOption,
-    userVotes,
     socket,
+    loading
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider value={value}>
