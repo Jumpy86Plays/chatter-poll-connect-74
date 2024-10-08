@@ -4,11 +4,7 @@ import io from 'socket.io-client';
 const AuthContext = createContext();
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 }
 
 export function AuthProvider({ children }) {
@@ -17,7 +13,6 @@ export function AuthProvider({ children }) {
   const [messages, setMessages] = useState([]);
   const [polls, setPolls] = useState([]);
   const [userVotes, setUserVotes] = useState({});
-  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -43,10 +38,6 @@ export function AuthProvider({ children }) {
         setPolls(prev => prev.map(poll => 
           poll.id === updatedPoll.id ? updatedPoll : poll
         ));
-      });
-
-      newSocket.on('online_users', (users) => {
-        setOnlineUsers(users);
       });
 
       return () => {
@@ -165,7 +156,6 @@ export function AuthProvider({ children }) {
     removeOption,
     userVotes,
     socket,
-    onlineUsers,
   };
 
   return (
