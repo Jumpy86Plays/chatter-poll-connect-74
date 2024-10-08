@@ -1,7 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
-const AuthContext = createContext();
+const AuthContext = createContext({
+  currentUser: null,
+  login: () => {},
+  logout: () => {},
+  messages: [],
+  sendMessage: () => {},
+  sendAnnouncement: () => {},
+  polls: [],
+  addPoll: () => {},
+  vote: () => {},
+  addOption: () => {},
+  removeOption: () => {},
+  socket: null,
+  loading: true,
+});
 
 export function useAuth() {
   return useContext(AuthContext);
@@ -166,13 +180,9 @@ export function AuthProvider({ children }) {
     loading
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
