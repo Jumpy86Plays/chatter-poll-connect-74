@@ -38,11 +38,7 @@ const Login = () => {
       navigate('/');
     } catch (err) {
       console.error("Authentication error:", err);
-      toast({
-        title: "Authentication Error",
-        description: err.message || "An error occurred during authentication",
-        variant: "destructive",
-      });
+      // Error message is now handled in AuthContext
     }
   };
 
