@@ -15,11 +15,15 @@ const ImageCapture = () => {
     toPng(ref.current, { 
       cacheBust: true,
       imagePlaceholder: '/placeholder.svg',
-      skipFonts: true, // Skip font inlining
+      skipFonts: true,
+      filter: (node) => {
+        // Skip capturing the button itself
+        return node.tagName !== 'BUTTON';
+      },
     })
       .then((dataUrl) => {
         const link = document.createElement('a');
-        link.download = 'my-image-name.png';
+        link.download = 'warframe-hub-capture.png';
         link.href = dataUrl;
         link.click();
       })
@@ -34,11 +38,11 @@ const ImageCapture = () => {
   };
 
   return (
-    <div>
-      <div ref={ref} style={{ fontFamily: 'Orbitron, sans-serif' }}>
-        {/* Your content to be captured goes here */}
-        <h1>This is a test</h1>
-        <p>This text should use the Orbitron font</p>
+    <div className="space-y-4">
+      <div ref={ref} className="p-4 bg-background border border-border rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-2">Warframe Hub Capture</h1>
+        <p className="text-foreground">This is a sample capture from Warframe Hub.</p>
+        {/* Add more content here as needed */}
       </div>
       <Button onClick={onButtonClick}>Capture Image</Button>
     </div>
