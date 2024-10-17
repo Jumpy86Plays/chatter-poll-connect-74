@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { VoteIcon, UserIcon, ChartBarIcon } from 'lucide-react';
+import { VoteIcon, ChartBarIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { votePoll } from '../services/pollService';
 import { useToast } from "@/components/ui/use-toast";
@@ -17,7 +17,7 @@ const Poll = ({ poll, onVote }) => {
 
   const handleVote = async (e) => {
     e.preventDefault();
-    if (userVote && !currentUser.isAdmin) {
+    if (userVote) {
       try {
         const updatedVotes = await votePoll(poll.id, userVote, currentUser.uid);
         onVote(poll.id, updatedVotes);
@@ -56,13 +56,13 @@ const Poll = ({ poll, onVote }) => {
           <RadioGroup value={userVote} onValueChange={setUserVote}>
             {poll.options.map((option) => (
               <div key={option} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={option} disabled={currentUser.isAdmin} />
+                <RadioGroupItem value={option} id={option} />
                 <Label htmlFor={option} className="text-yellow-200">{option}</Label>
               </div>
             ))}
           </RadioGroup>
-          <Button type="submit" disabled={!userVote || currentUser.isAdmin} className="w-full bg-yellow-600 text-black hover:bg-yellow-700 transition-colors duration-300">
-            {currentUser.isAdmin ? "Jedi Masters can't vote" : "Cast Your Vote"}
+          <Button type="submit" disabled={!userVote} className="w-full bg-yellow-600 text-black hover:bg-yellow-700 transition-colors duration-300">
+            Cast Your Vote
           </Button>
         </form>
         <div className="space-y-4">
