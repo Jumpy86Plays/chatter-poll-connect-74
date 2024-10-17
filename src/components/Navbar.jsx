@@ -42,7 +42,7 @@ const Navbar = () => {
             <Button onClick={toggleTheme} variant="ghost" size="icon" className="hover:bg-accent hover:text-accent-foreground transition-colors duration-200">
               {isDarkMode ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
             </Button>
-            {currentUser && (
+            {currentUser && onlineUsers && (
               <div className="flex items-center space-x-2 bg-accent bg-opacity-20 px-3 py-1 rounded-full">
                 <WifiIcon className="h-4 w-4 text-primary" />
                 <span className="text-sm">
