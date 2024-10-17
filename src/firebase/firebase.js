@@ -10,7 +10,8 @@ const firebaseConfig = {
   projectId: "live-discussion-room",
   storageBucket: "live-discussion-room.appspot.com",
   messagingSenderId: "267267876972",
-  appId: "1:267267876972:web:a4340dd77bc24fadce1049"
+  appId: "1:267267876972:web:a4340dd77bc24fadce1049",
+  measurementId: "G-FPZH41125K"
 };
 
 const app = initializeApp(firebaseConfig);
