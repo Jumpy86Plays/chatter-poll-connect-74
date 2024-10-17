@@ -6,7 +6,7 @@ import { getDatabase } from 'firebase/database';
 const firebaseConfig = {
   apiKey: "AIzaSyCUUwjhif34NLRkWk2fwR2L-TfLlc_fjH8",
   authDomain: "live-discussion-room.firebaseapp.com",
-  databaseURL: "https://live-discussion-room.firebaseio.com",
+  databaseURL: "https://live-discussion-room-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "live-discussion-room",
   storageBucket: "live-discussion-room.appspot.com",
   messagingSenderId: "267267876972",
