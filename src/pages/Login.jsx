@@ -7,21 +7,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import Captcha from '../components/Captcha';
 import { LogInIcon, UserPlusIcon } from 'lucide-react';
+import { useToast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const { login, signUp } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = async (e, isSignUp = false) => {
     e.preventDefault();
-    setError('');
 
     if (!isCaptchaValid) {
-      setError('Please enter the correct captcha');
+      toast({
+        title: "Captcha Error",
+        description: "Please complete the captcha",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -33,7 +37,12 @@ const Login = () => {
       }
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Failed to log in. Please check your credentials.');
+      console.error("Authentication error:", err);
+      toast({
+        title: "Authentication Error",
+        description: err.message || "An error occurred during authentication",
+        variant: "destructive",
+      });
     }
   };
 
@@ -82,7 +91,6 @@ const Login = () => {
             <UserPlusIcon className="h-4 w-4 mr-2" />
             Sign Up
           </Button>
-          {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         </CardContent>
       </Card>
     </div>

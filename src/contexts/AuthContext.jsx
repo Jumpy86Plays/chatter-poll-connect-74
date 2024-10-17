@@ -29,7 +29,6 @@ export function AuthProvider({ children }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Store user data in Firestore
       await setDoc(doc(db, 'users', user.uid), {
         email: user.email,
         createdAt: new Date().toISOString(),
@@ -39,6 +38,7 @@ export function AuthProvider({ children }) {
         title: "Account created",
         description: "You've successfully signed up!",
       });
+      return user;
     } catch (error) {
       console.error("Error signing up:", error);
       toast({
@@ -52,16 +52,17 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: "Logged in",
         description: "Welcome back!",
       });
+      return userCredential.user;
     } catch (error) {
       console.error("Error logging in:", error);
       toast({
         title: "Login failed",
-        description: error.message,
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
       throw error;
