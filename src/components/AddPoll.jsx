@@ -4,11 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircleIcon, MinusCircleIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from "@/components/ui/use-toast";
 
 const AddPoll = () => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
   const { addPoll } = useAuth();
+  const { toast } = useToast();
 
   const handleAddOption = () => {
     setOptions([...options, '']);
@@ -34,13 +36,23 @@ const AddPoll = () => {
       });
       setQuestion('');
       setOptions(['', '']);
+      toast({
+        title: "Poll Created",
+        description: "Your poll has been successfully created.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields before creating the poll.",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Add New Poll</CardTitle>
+        <CardTitle>Create New Poll</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
