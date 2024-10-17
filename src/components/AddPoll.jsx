@@ -3,14 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircleIcon, MinusCircleIcon } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from "@/components/ui/use-toast";
 
-const AddPoll = () => {
+const AddPoll = ({ onAddPoll }) => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
-  const { addPoll } = useAuth();
-  const { toast } = useToast();
 
   const handleAddOption = () => {
     setOptions([...options, '']);
@@ -29,23 +25,12 @@ const AddPoll = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (question && options.every(option => option.trim() !== '')) {
-      addPoll({
+      onAddPoll({
         question,
         options: options.filter(option => option.trim() !== ''),
-        votes: {}
       });
       setQuestion('');
       setOptions(['', '']);
-      toast({
-        title: "Poll Created",
-        description: "Your poll has been successfully created.",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields before creating the poll.",
-        variant: "destructive",
-      });
     }
   };
 
