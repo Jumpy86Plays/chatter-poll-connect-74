@@ -13,10 +13,10 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
-  const { login, signIn } = useAuth();
+  const { login, signUp } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e, isSignIn = false) => {
+  const handleSubmit = async (e, isSignUp = false) => {
     e.preventDefault();
     setError('');
 
@@ -26,12 +26,12 @@ const Login = () => {
     }
 
     try {
-      if (isSignIn) {
-        await signIn(email, password);
+      if (isSignUp) {
+        await signUp(email, password);
       } else {
         await login(email, password);
       }
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to log in. Please check your credentials.');
     }
